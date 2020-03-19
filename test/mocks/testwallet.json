@@ -1,0 +1,85 @@
+{
+  "network": "testnet",
+  "mnemonic": "during ask there already rebel february switch pipe purity alert humor silent manual smart whale melody hybrid depend axis extra elevator struggle evidence matrix",
+  "rootAddress": "bchtest:qqfzejzg9647tadnlemes6kjjmd948ne25jx6el90r",
+  "balance": 0.09999751999999999,
+  "nextAddress": 4,
+  "derivation": 245,
+  "hasBalance": [
+    {
+      "index": 2,
+      "balance": 0.03,
+      "balanceSat": 3000000,
+      "unconfirmedBalance": 0,
+      "unconfirmedBalanceSat": 0,
+      "cashAddress": "bchtest:qzrg022p8ykc90c27gy808pmz3lzlwk6lg77y3h8fm"
+    },
+    {
+      "index": 3,
+      "balance": 0,
+      "balanceSat": 0,
+      "unconfirmedBalance": 0,
+      "unconfirmedBalanceSat": 0,
+      "cashAddress": "bchtest:qq4sx72yfuhqryzm9h23zez27n6n24hdavvfqn2ma3"
+    },
+    {
+      "index": 10,
+      "balance": 0,
+      "balanceSat": 0,
+      "unconfirmedBalance": 0.00021247,
+      "unconfirmedBalanceSat": 21247,
+      "cashAddress": "bitcoincash:qrwp9ht9nhfjhkfwm7zwxfgrrs4afduphu7g9qn6fx"
+    },
+    {
+      "index": 11,
+      "balance": 0,
+      "balanceSat": 0,
+      "unconfirmedBalance": 0.00000546,
+      "unconfirmedBalanceSat": 546,
+      "cashAddress": "bitcoincash:qpknkf95hgc432kmru44qgx4le8sunny85yf0d72nj"
+    }
+  ],
+  "name": "demowallet",
+  "balanceConfirmed": 0.00726061,
+  "balanceUnconfirmed": -0.00006294,
+  "SLPUtxos": [
+    {
+      "txid": "1472ba027fd7d5f608e98443c79ad94c626d41a086e4a16d912851e85f67bf31",
+      "vout": 2,
+      "amount": 0.00000546,
+      "satoshis": 546,
+      "confirmations": 0,
+      "ts": 1567614296,
+      "utxoType": "token",
+      "tokenId": "73db55368981e4878440637e448d4abe7f661be5c3efdcbcb63bd86a01a76b5a",
+      "tokenTicker": "SLPTEST",
+      "tokenName": "Test SLP token",
+      "tokenDocumentUrl": "",
+      "tokenDocumentHash": "",
+      "decimals": 0,
+      "tokenQty": 17,
+      "cashAddr": "bitcoincash:qrwp9ht9nhfjhkfwm7zwxfgrrs4afduphu7g9qn6fx",
+      "slpAddr": "simpleledger:qrwp9ht9nhfjhkfwm7zwxfgrrs4afduphujnwmx6hc",
+      "hdIndex": 10
+    },
+    {
+      "txid": "c6591b961ed9db15d57d161521cbf86bbf645cde19301b21d366ca92c54a9e20",
+      "vout": 1,
+      "amount": 0.00000546,
+      "satoshis": 546,
+      "confirmations": 0,
+      "ts": 1567614397,
+      "utxoType": "token",
+      "tokenId": "73db55368981e4878440637e448d4abe7f661be5c3efdcbcb63bd86a01a76b5a",
+      "tokenTicker": "SLPTEST",
+      "tokenName": "Test SLP token",
+      "tokenDocumentUrl": "",
+      "tokenDocumentHash": "",
+      "decimals": 0,
+      "tokenQty": 1,
+      "cashAddr": "bitcoincash:qpknkf95hgc432kmru44qgx4le8sunny85yf0d72nj",
+      "slpAddr": "simpleledger:qpknkf95hgc432kmru44qgx4le8sunny85gjykt2dv",
+      "hdIndex": 11
+    }
+  ]
+}
