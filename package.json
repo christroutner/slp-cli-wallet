@@ -1,12 +1,12 @@
 {
   "name": "slp-cli-wallet",
-  "description": "A command line wallet for Bitcoin Cash and SLP tokens, built with BITBOX",
-  "version": "1.5.0",
+  "description": "A hacker-friendly, command line BCH and SLP wallet built with bch-js",
+  "version": "2.0.0",
   "author": "Chris Troutner @christroutner",
   "bin": {
     "slp-cli-wallet": "./bin/run"
   },
-  "bugs": "https://github.com/christroutner/bch-cli-wallet/issues",
+  "bugs": "https://github.com/christroutner/slp-cli-wallet/issues",
   "dependencies": {
     "@chris.troutner/bch-js": "^2.3.9",
     "@oclif/command": "^1.5.4",
@@ -45,7 +45,7 @@
     "/wallets",
     "/config"
   ],
-  "homepage": "https://github.com/christroutner/bch-cli-wallet",
+  "homepage": "https://github.com/christroutner/slp-cli-wallet",
   "keywords": [
     "oclif"
   ],
@@ -58,7 +58,7 @@
       "@oclif/plugin-help"
     ]
   },
-  "repository": "christroutner/bch-cli-wallet",
+  "repository": "christroutner/slp-cli-wallet",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "oclif-dev manifest && oclif-dev readme",
