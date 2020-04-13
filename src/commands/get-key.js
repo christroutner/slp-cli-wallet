@@ -58,6 +58,7 @@ class GetKey extends Command {
       // Display the Private Key
       qrcode.generate(newPair.priv, { small: true })
       this.log(`Private Key: ${newPair.priv}`)
+      this.log(`Public Key: ${newPair.pubKey}`)
 
       // Display the address as a QR code.
       qrcode.generate(newAddress, { small: true })
@@ -117,9 +118,13 @@ class GetKey extends Command {
       // get the private key
       const newKey = this.BITBOX.HDNode.toWIF(change)
 
+      const ec = this.BITBOX.ECPair.fromWIF(newKey)
+      const pubKey = this.BITBOX.ECPair.toPublicKey(ec)
+
       return {
         priv: newKey,
-        pub: newAddress
+        pub: newAddress,
+        pubKey: pubKey.toString("hex")
       }
     } catch (err) {
       console.log(`Error in getPair().`)
