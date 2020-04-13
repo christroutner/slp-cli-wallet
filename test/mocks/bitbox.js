@@ -208,7 +208,8 @@ const bitboxMock = {
   },
   ECPair: {
     fromWIF: sinon.stub().returns({}),
-    toCashAddress: sinon.stub().returns({})
+    toCashAddress: sinon.stub().returns({}),
+    toPublicKey: sinon.stub().returns({})
   }
 }
 
