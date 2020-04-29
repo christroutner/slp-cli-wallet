@@ -229,6 +229,7 @@ class Send extends Command {
           )
           continue
         }
+        // console.log(`isValid: `, isValid)
 
         // Skip if change would less than the dust amount.
         if (thisUTXO.satoshis - bchSatoshis < 546) continue
