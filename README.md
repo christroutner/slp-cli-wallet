@@ -8,8 +8,6 @@ This is an npm library and Bitcoin Cash (BCH) wallet that runs on the command
 line. Add this library to your app to instantly give it the ability to transact
 on the BCH network! New to Bitcoin Cash? Learn the basics with [Mastering Bitcoin Cash](https://developer.bitcoin.com/mastering-bitcoin-cash/).
 
-This project is forked from the Bitcoin.com [bch-cli-wallet](https://github.com/Bitcoin-com/bch-cli-wallet), and has been expanded to support SLP tokens. These new features may be rolled into that parent repository and this library deprecated. But for now, they are two separate libraries.
-
 This project has the following goals:
 - Create a code base for a wallet that is easily forkable and extensible by JavaScript developers.
 - Provide a high-level abstraction to make it easy for new developers to add BCH and SLP wallet functionality into their apps.
