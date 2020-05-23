@@ -1,7 +1,11 @@
 /*
-  Forked from get-private-key.js. This command is exactly the same, except that it
-  sets the WIF and BCH addr in the wallet as the one to use for encryption
-  tasks.
+  Forked from get-address.js. This command generates a private key and public
+  address. Both are displayed on the command line along with a QR code.
+  This is exactly the same thing as generating a 'paper wallet'.
+  The QR code for private key can be 'swept' with the bitcoin.com wallet.
+
+  -The next available address is tracked by the 'nextAddress' property in the
+  wallet .json file.
 */
 
 "use strict"
@@ -27,17 +31,16 @@ const { Command, flags } = require("@oclif/command")
 
 //let _this
 
-class SetKey extends Command {
+class GetKey extends Command {
   constructor(argv, config) {
     super(argv, config)
 
     this.BITBOX = BITBOX
-    this.appUtils = appUtils
   }
 
   async run() {
     try {
-      const { flags } = this.parse(SetKey)
+      const { flags } = this.parse(GetKey)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -53,7 +56,9 @@ class SetKey extends Command {
       const newAddress = newPair.pub
 
       // Display the Private Key
-      // qrcode.generate(newPair.priv, { small: true })
+      qrcode.generate(newPair.priv, { small: true })
+      this.log(`Private Key: ${newPair.priv}`)
+      this.log(`Public Key: ${newPair.pubKey}`)
 
       // Display the address as a QR code.
       qrcode.generate(newAddress, { small: true })
@@ -64,36 +69,9 @@ class SetKey extends Command {
 
       const slpAddr = this.BITBOX.SLP.Address.toSLPAddress(newAddress)
       console.log(`${slpAddr}`)
-
-      this.log(`Private Key: ${newPair.priv}`)
-      this.log(`Public Key: ${newPair.pubKey}`)
-
-      // Generate a encryption object to save in the wallet.
-      const encrypt = {
-        bchAddr: newAddress,
-        slpAddr: slpAddr,
-        pubKey: newPair.pubKey,
-        privKey: newPair.priv
-      }
-
-      await this.saveKey(encrypt, filename)
     } catch (err) {
       if (err.message) console.log(err.message)
-      else console.log(`Error in SetKey.run: `, err)
-    }
-  }
-
-  // Save key data to the wallet file.
-  async saveKey(encrypt, walletFilename) {
-    try {
-      const walletInfo = appUtils.openWallet(walletFilename)
-
-      walletInfo.encrypt = encrypt
-
-      await this.appUtils.saveWallet(walletFilename, walletInfo)
-    } catch (err) {
-      console.log(`Error in saveKey().`)
-      throw err
+      else console.log(`Error in GetKey.run: `, err)
     }
   }
 
@@ -165,10 +143,10 @@ class SetKey extends Command {
   }
 }
 
-SetKey.description = `Generate a new private/public key pair.`
+GetKey.description = `Generate a new private/public key pair.`
 
-SetKey.flags = {
+GetKey.flags = {
   name: flags.string({ char: "n", description: "Name of wallet" })
 }
 
-module.exports = SetKey
+module.exports = GetKey

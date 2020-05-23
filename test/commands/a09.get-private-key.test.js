@@ -7,7 +7,7 @@
 const assert = require("chai").assert
 
 const CreateWallet = require("../../src/commands/create-wallet")
-const GetKey = require("../../src/commands/get-key")
+const GetKey = require("../../src/commands/get-private-key")
 const config = require("../../config")
 
 const { bitboxMock } = require("../mocks/bitbox")

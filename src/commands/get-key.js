@@ -1,11 +1,5 @@
 /*
-  Forked from get-address.js. This command generates a private key and public
-  address. Both are displayed on the command line along with a QR code.
-  This is exactly the same thing as generating a 'paper wallet'.
-  The QR code for private key can be 'swept' with the bitcoin.com wallet.
-
-  -The next available address is tracked by the 'nextAddress' property in the
-  wallet .json file.
+  Get the key pair set in the wallet for use with encrypted messages.
 */
 
 "use strict"
@@ -36,6 +30,7 @@ class GetKey extends Command {
     super(argv, config)
 
     this.BITBOX = BITBOX
+    this.appUtils = appUtils
   }
 
   async run() {
@@ -45,90 +40,30 @@ class GetKey extends Command {
       // Validate input flags
       this.validateFlags(flags)
 
-      // Determine if this is a testnet wallet or a mainnet wallet.
-      if (flags.testnet)
-        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+      // Get the encryption information from the wallet.
+      const encrypt = this.getKey(flags)
 
-      // Generate an absolute filename from the name.
-      const filename = `${__dirname}/../../wallets/${flags.name}.json`
-
-      const newPair = await this.getPair(filename)
-      const newAddress = newPair.pub
-
-      // Display the Private Key
-      qrcode.generate(newPair.priv, { small: true })
-      this.log(`Private Key: ${newPair.priv}`)
-      this.log(`Public Key: ${newPair.pubKey}`)
-
-      // Display the address as a QR code.
-      qrcode.generate(newAddress, { small: true })
-
-      // Display the address to the user.
-      this.log(`${newAddress}`)
-      //this.log(`legacy address: ${legacy}`)
-
-      const slpAddr = this.BITBOX.SLP.Address.toSLPAddress(newAddress)
-      console.log(`${slpAddr}`)
+      console.log(
+        `Key pair for encryption: ${JSON.stringify(encrypt, null, 2)}`
+      )
     } catch (err) {
       if (err.message) console.log(err.message)
-      else console.log(`Error in GetKey.run: `, err)
+      else console.log(`Error in SetKey.run: `, err)
     }
   }
 
-  // Get a private/public key pair. Private key in WIF format.
-  async getPair(filename) {
+  // Returns the encryption information stored in a wallet file.
+  getKey(flags) {
     try {
-      //const filename = `${__dirname}/../../wallets/${name}.json`
-      const walletInfo = appUtils.openWallet(filename)
-      //console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
+      // Generate an absolute filename from the name.
+      const filename = `${__dirname}/../../wallets/${flags.name}.json`
 
-      // root seed buffer
-      let rootSeed
-      if (config.RESTAPI === "bitcoin.com")
-        rootSeed = this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
-      else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
+      const walletInfo = this.appUtils.openWallet(filename)
 
-      // master HDNode
-      if (walletInfo.network === "testnet")
-        var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, "testnet")
-      else var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
-
-      // HDNode of BIP44 account
-      const account = this.BITBOX.HDNode.derivePath(
-        masterHDNode,
-        `m/44'/${walletInfo.derivation}'/0'`
-      )
-
-      // derive an external change address HDNode
-      const change = this.BITBOX.HDNode.derivePath(
-        account,
-        `0/${walletInfo.nextAddress}`
-      )
-
-      // Increment to point to a new address for next time.
-      walletInfo.nextAddress++
-
-      // Update the wallet file.
-      await appUtils.saveWallet(filename, walletInfo)
-
-      // get the cash address
-      const newAddress = this.BITBOX.HDNode.toCashAddress(change)
-      //const legacy = BITBOX.HDNode.toLegacyAddress(change)
-
-      // get the private key
-      const newKey = this.BITBOX.HDNode.toWIF(change)
-
-      const ec = this.BITBOX.ECPair.fromWIF(newKey)
-      const pubKey = this.BITBOX.ECPair.toPublicKey(ec)
-
-      return {
-        priv: newKey,
-        pub: newAddress,
-        pubKey: pubKey.toString("hex")
-      }
+      return walletInfo.encrypt
     } catch (err) {
-      console.log(`Error in getPair().`)
-      throw err
+      if (err.message) console.log(err.message)
+      else console.log(`Error in GetKey.run: `, err)
     }
   }
 
