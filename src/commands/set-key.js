@@ -27,7 +27,7 @@ const { Command, flags } = require("@oclif/command")
 
 //let _this
 
-class GetKey extends Command {
+class SetKey extends Command {
   constructor(argv, config) {
     super(argv, config)
 
@@ -37,7 +37,7 @@ class GetKey extends Command {
 
   async run() {
     try {
-      const { flags } = this.parse(GetKey)
+      const { flags } = this.parse(SetKey)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -79,7 +79,7 @@ class GetKey extends Command {
       await this.saveKey(encrypt, filename)
     } catch (err) {
       if (err.message) console.log(err.message)
-      else console.log(`Error in GetKey.run: `, err)
+      else console.log(`Error in SetKey.run: `, err)
     }
   }
 
@@ -165,10 +165,10 @@ class GetKey extends Command {
   }
 }
 
-GetKey.description = `Generate a new private/public key pair.`
+SetKey.description = `Generate a new private/public key pair.`
 
-GetKey.flags = {
+SetKey.flags = {
   name: flags.string({ char: "n", description: "Name of wallet" })
 }
 
-module.exports = GetKey
+module.exports = SetKey
