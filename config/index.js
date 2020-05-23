@@ -2,16 +2,14 @@
   This config file contains settings shared across files.
 
   Toolset and REST API can be selected with this file, or by setting the RESTAPI
-  environment variable. By default, Bitcoin.com's infrastructure is used.
+  environment variable. By default, FullStack.cash's infrastructure is used.
 
-  You can run your own infrastructure. See bchjs.cash for details.
+  You can run your own infrastructure. See FullStack.cash/CashStrap for details.
 */
 
 "use strict"
 
 // By default choose a local rest API.
-// let RESTAPI = "rest.bitcoin.com"
-// let RESTAPI = "wallet"
 let RESTAPI = "fullstack.cash"
 
 // Override the RESTAPI setting if envronment variable is set.
@@ -24,13 +22,19 @@ if (process.env.RESTAPI && process.env.RESTAPI !== "")
 process.env.RESTAPI = RESTAPI
 
 const BCHJS = require("@chris.troutner/bch-js")
-// const BITBOX = require("slp-sdk")
 
 const config = {}
 
 // Set the JWT access token.
 config.JWT = "" // default value
 if (process.env.BCHJSTOKEN) config.JWT = process.env.BCHJSTOKEN
+
+if (RESTAPI === "fullstack.cash") {
+  config.BCHLIB = BCHJS
+  config.MAINNET_REST = `https://api.fullstack.cash/v3/`
+  config.TESTNET_REST = `https://tapi.fullstack.cash/v3/`
+  config.RESTAPI = "fullstack.cash"
+}
 
 if (RESTAPI === "wallet") {
   config.BCHLIB = BCHJS.BitboxShim()
@@ -39,13 +43,6 @@ if (RESTAPI === "wallet") {
   config.MAINNET_REST = `https://wallet.bchjs.cash/v3/`
   config.TESTNET_REST = `https://twallet.bchjs.cash/v3/`
   config.RESTAPI = "wallet"
-}
-
-if (RESTAPI === "fullstack.cash") {
-  config.BCHLIB = BCHJS.BitboxShim()
-  config.MAINNET_REST = `https://api.fullstack.cash/v3/`
-  config.TESTNET_REST = `https://tapi.fullstack.cash/v3/`
-  config.RESTAPI = "bchjs"
 }
 
 // Use BITBOX and the bitcoin.com infrastructure.

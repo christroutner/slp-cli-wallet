@@ -126,7 +126,7 @@ class GetAddress extends Command {
     if (flags && flags.token) {
       if (config.RESTAPI === "bitcoin.com")
         newAddress = this.BITBOX.Address.toSLPAddress(newAddress)
-      else newAddress = this.BITBOX.Address.toSLPAddress(newAddress)
+      else newAddress = this.BITBOX.SLP.Address.toSLPAddress(newAddress)
     }
 
     return newAddress

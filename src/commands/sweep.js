@@ -367,7 +367,7 @@ class Sweep extends Command {
       if (utxos.length === 0) return { bchUtxos, tokenUtxos }
 
       // Figure out which UTXOs are associated with SLP tokens.
-      const isTokenUtxo = await this.BITBOX.Util.tokenUtxoDetails(utxos)
+      const isTokenUtxo = await this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
       // console.log(`isTokenUtxo: ${JSON.stringify(isTokenUtxo, null, 2)}`)
 
       // Separate the bch and token UTXOs.

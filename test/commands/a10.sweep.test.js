@@ -149,7 +149,7 @@ describe("Sweep", () => {
             .resolves(mockData.tokenOnlyUtxos)
 
           sandbox
-            .stub(sweep.BITBOX.Util, "tokenUtxoDetails")
+            .stub(sweep.BITBOX.SLP.Utils, "tokenUtxoDetails")
             .resolves(mockData.tokenOnlyTokenInfo)
         }
 
@@ -172,7 +172,7 @@ describe("Sweep", () => {
           .resolves(mockData.bchOnlyUtxos)
 
         sandbox
-          .stub(sweep.BITBOX.Util, "tokenUtxoDetails")
+          .stub(sweep.BITBOX.SLP.Utils, "tokenUtxoDetails")
           .resolves(mockData.bchOnlyTokenInfo)
       }
 
@@ -196,7 +196,7 @@ describe("Sweep", () => {
           .resolves(mockData.bothUtxos)
 
         sandbox
-          .stub(sweep.BITBOX.Util, "tokenUtxoDetails")
+          .stub(sweep.BITBOX.SLP.Utils, "tokenUtxoDetails")
           .resolves(mockData.bothTokenInfo)
       }
 
