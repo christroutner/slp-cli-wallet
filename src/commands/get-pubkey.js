@@ -25,7 +25,7 @@ class GetPubKey extends Command {
   constructor(argv, config) {
     super(argv, config)
 
-    this.bchjs = bchjs
+    this.bchjs = BCHJS
     this.appUtils = appUtils
   }
 
@@ -45,10 +45,34 @@ class GetPubKey extends Command {
       }
 
       // Generate an absolute filename from the name.
-      const filename = `${__dirname}/../../wallets/${flags.name}.json`
+      // const filename = `${__dirname}/../../wallets/${flags.name}.json`
+
+      const pubKey = await this.getPubKey(flags)
+
+      if (pubKey) console.log(`Public key: ${pubKey}`)
     } catch (err) {
-      if (err.message) console.log(err.message)
-      else console.log(`Error in GetKey.run: `, err)
+      if (err.message) console.log(err.message, err)
+      else console.log(`Error in GetPubKey.run: `, err)
+    }
+  }
+
+  // Make an axios call to the FullStack.cash API to look for the public key.
+  async getPubKey(flags) {
+    try {
+      const addr = flags.address
+
+      const result = await this.bchjs.encryption.getPubKey(addr)
+
+      if (!result.success) {
+        console.log(`Public key could not be found on the blockchain.`)
+        return false
+      }
+
+      // console.log(`Public key: ${result.publicKey}`)
+      return result.publicKey
+    } catch (err) {
+      console.error(`Error in get-pubkey.js/getPubKey()`)
+      throw err
     }
   }
 
