@@ -358,25 +358,32 @@ class EncryptMessage extends Command {
 
   // Upload an object to IPFS as a JSON file.
   async uploadToIpfs(obj) {
-    // Write the object to a temporary file.
-    const filename = await this.writeObject(obj)
+    try {
+      // Write the object to a temporary file.
+      const filename = await this.writeObject(obj)
 
-    // Request a BCH address and amount of BCH to pay for hosting the file.
-    const fileModel = await this.bchjs.IPFS.createFileModel(`./${filename}`)
-    // console.log(`fileModel: ${JSON.stringify(fileModel, null, 2)}`)
+      // Request a BCH address and amount of BCH to pay for hosting the file.
+      const fileModel = await this.bchjs.IPFS.createFileModel(`./${filename}`)
+      // console.log(`fileModel: ${JSON.stringify(fileModel, null, 2)}`)
 
-    // This file ID is used to identify the file we're about to upload.
-    const fileId = fileModel.file._id
-    // console.log(`ID for your file: ${fileId}`)
+      // This file ID is used to identify the file we're about to upload.
+      const fileId = fileModel.file._id
+      // console.log(`ID for your file: ${fileId}`)
 
-    // Upload the actual file, include the ID assigned to it by the server.
-    await this.bchjs.IPFS.uploadFile(`./${filename}`, fileId)
-    // console.log(`fileObj: ${JSON.stringify(fileObj, null, 2)}`)
+      // Upload the actual file, include the ID assigned to it by the server.
+      await this.bchjs.IPFS.uploadFile(`./${filename}`, fileId)
+      // console.log(`fileObj: ${JSON.stringify(fileObj, null, 2)}`)
 
-    return {
-      paymentAddr: fileModel.file.bchAddr,
-      paymentAmount: fileModel.hostingCostBCH,
-      fileId: fileId
+      this.deleteFile(filename)
+
+      return {
+        paymentAddr: fileModel.file.bchAddr,
+        paymentAmount: fileModel.hostingCostBCH,
+        fileId: fileId
+      }
+    } catch (err) {
+      console.error(`Error in uploadToIpfs()`)
+      throw err
     }
   }
 
@@ -427,6 +434,16 @@ class EncryptMessage extends Command {
         return reject(err)
       }
     })
+  }
+
+  // Delete the file that was generate with writeObject.
+  deleteFile(filename) {
+    try {
+      fs.unlinkSync(`./${filename}`)
+    } catch (err) {
+      console.error(`Error in deleteFile()`)
+      throw err
+    }
   }
 }
 
