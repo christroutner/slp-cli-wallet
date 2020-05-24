@@ -17,7 +17,8 @@
     "collect.js": "^4.16.6",
     "eccrypto-js": "^5.2.0",
     "qrcode-terminal": "^0.12.0",
-    "shelljs": "^0.8.2"
+    "shelljs": "^0.8.2",
+    "wif": "^2.0.6"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.19.5",
