@@ -47,7 +47,7 @@ class GetPubKey extends Command {
       // Generate an absolute filename from the name.
       // const filename = `${__dirname}/../../wallets/${flags.name}.json`
 
-      const pubKey = await this.getPubKey(flags)
+      const pubKey = await this.queryBlockchain(flags)
 
       if (pubKey) console.log(`Public key: ${pubKey}`)
     } catch (err) {
@@ -57,7 +57,7 @@ class GetPubKey extends Command {
   }
 
   // Make an axios call to the FullStack.cash API to look for the public key.
-  async getPubKey(flags) {
+  async queryBlockchain(flags) {
     try {
       const addr = flags.address
 

@@ -78,7 +78,7 @@ class GetKey extends Command {
   }
 }
 
-GetKey.description = `Generate a new private/public key pair.`
+GetKey.description = `Get the encryption key info for the keypair set with set-key`
 
 GetKey.flags = {
   name: flags.string({ char: "n", description: "Name of wallet" })

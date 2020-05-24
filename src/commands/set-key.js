@@ -165,7 +165,7 @@ class SetKey extends Command {
   }
 }
 
-SetKey.description = `Generate a new private/public key pair.`
+SetKey.description = `Generate a new private/public key pair, to use for encryption.`
 
 SetKey.flags = {
   name: flags.string({ char: "n", description: "Name of wallet" })
