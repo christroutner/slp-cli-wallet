@@ -54,12 +54,17 @@ class EncryptMessage extends Command {
         })
       }
 
-      const { bchTxid, ipfsHash } = await this.encryptAndSendMessage(flags)
+      const {
+        ipfsPaymentTxid,
+        signalTxid,
+        ipfsHash
+      } = await this.encryptAndSendMessage(flags)
 
       console.log(
         `Encrypted message upload to IPFS with this hash: ${ipfsHash}`
       )
-      console.log(`Message signal delivered with BCH TXID: ${bchTxid}`)
+      console.log(`IPFS file hosting paid for with this tx: ${ipfsPaymentTxid}`)
+      console.log(`Message signal delivered with BCH TXID: ${signalTxid}`)
     } catch (err) {
       if (err.message) console.log(`${err.message}: `, err)
       else console.log(`Error in EncryptMessage.run(): `, err)
@@ -112,7 +117,7 @@ class EncryptMessage extends Command {
       )
 
       const fundingInfo = this.getKey.getKey(flags)
-      console.log(`fundingInfo: ${JSON.stringify(fundingInfo, null, 2)}`)
+      // console.log(`fundingInfo: ${JSON.stringify(fundingInfo, null, 2)}`)
 
       // Generate a transaction to pay IPFS hosting fee.
       const hostingHex = await this.payIpfsHosting(fundingInfo, ipfsHosting)
@@ -120,17 +125,24 @@ class EncryptMessage extends Command {
 
       // Broadcast the hosting payment transaction.
       const hostingTxid = await _this.appUtils.broadcastTx(hostingHex)
-      console.log(`hostingTxid: ${hostingTxid}`)
+      // console.log(`hostingTxid: ${hostingTxid}`)
 
       // Wait for the IPFS file server to return an IPFS hash.
       const ipfsHash = await _this.waitForIpfsHash(ipfsHosting.fileId)
-      console.log(`ipfsHash: ${ipfsHash}`)
+      // console.log(`ipfsHash: ${ipfsHash}`)
 
       // Create a memo.cash protocol transaction to signal message to recipient.
+      const signalHex = await _this.signalMessage(fundingInfo, ipfsHash, toAddr)
+      // console.log(`signalHex: `, signalHex)
+
+      // Broadcast the signal to the recipient.
+      const signalTxid = await _this.appUtils.broadcastTx(signalHex)
+      // console.log(`signalTxid: ${signalTxid}`)
 
       return {
-        bchTxid: 1,
-        ipfsHash: 2
+        ipfsPaymentTxid: hostingTxid,
+        signalTxid: signalTxid,
+        ipfsHash: ipfsHash
       }
     } catch (err) {
       console.error(`Error in encryptAndSendMessage()`)
@@ -147,7 +159,7 @@ class EncryptMessage extends Command {
         )
       }
 
-      const ipfsHash = ""
+      let ipfsHash = ""
 
       while (!ipfsHash) {
         // for (let i = 0; i < 8; i++) {
@@ -159,7 +171,7 @@ class EncryptMessage extends Command {
         await _this.appUtils.sleep(30000)
 
         const result = await _this.bchjs.IPFS.getStatus(fileId)
-        console.log(`result: ${JSON.stringify(result, null, 2)}`)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
         if (result.ipfsHash) ipfsHash = result.ipfsHash
       }
@@ -247,10 +259,11 @@ class EncryptMessage extends Command {
     }
   }
 
-  async signalMessage(fundingInfo, ipfsHosting) {
+  async signalMessage(fundingInfo, ipfsHash, toAddr) {
     try {
       console.log(`fundingInfo: ${JSON.stringify(fundingInfo, null, 2)}`)
-      console.log(`ipfsHosting: ${JSON.stringify(ipfsHosting, null, 2)}`)
+      console.log(`ipfsHash: ${JSON.stringify(ipfsHash, null, 2)}`)
+      console.log(`toAddr: `, toAddr)
 
       // Create an EC Key Pair from the user-supplied WIF.
       const ecPair = _this.bchjs.ECPair.fromWIF(fundingInfo.privKey)
@@ -281,21 +294,26 @@ class EncryptMessage extends Command {
 
       // TODO: Compute the 1 sat/byte fee.
       const fee = 500
+      const dust = 546
 
-      // Send the same amount - fee.
-      transactionBuilder.addOutput(recvAddr, originalAmount - fee)
+      // Send the UTXO back to yourself, less the fee and dust.
+      transactionBuilder.addOutput(sendAddr, originalAmount - fee - dust)
 
       // Add the memo.cash OP_RETURN to the transaction.
+      // This contains the IPFS hash needed to download the message.
       const script = [
         _this.bchjs.Script.opcodes.OP_RETURN,
         Buffer.from("6d02", "hex"),
-        Buffer.from(title)
+        Buffer.from(`MSG IPFS ${ipfsHash}`)
       ]
 
       // console.log(`script: ${util.inspect(script)}`);
       const data = _this.bchjs.Script.encode(script)
       // console.log(`data: ${util.inspect(data)}`);
       transactionBuilder.addOutput(data, 0)
+
+      // Send a dust amount to the recipient to signal to them that they have a message.
+      transactionBuilder.addOutput(toAddr, dust)
 
       // Sign the transaction with the HD node.
       let redeemScript
@@ -313,10 +331,8 @@ class EncryptMessage extends Command {
       const hex = tx.toHex()
 
       return hex
-
-      return true
     } catch (err) {
-      console.error(`Error in payIpfsHosting()`)
+      console.error(`Error in signalMessage()`)
       throw err
     }
   }
