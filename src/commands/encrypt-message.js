@@ -22,6 +22,7 @@ const BCHJS = new config.BCHLIB({
 
 const { Command, flags } = require("@oclif/command")
 
+const inputPath = `${__dirname}/../../packaged-files`
 let _this
 
 class EncryptMessage extends Command {
@@ -31,7 +32,7 @@ class EncryptMessage extends Command {
     this.bchjs = BCHJS
     this.eccrypto = eccrypto
     this.fs = fs
-
+    this.inputPath = inputPath
     this.getPubKey = new GetPubKey(argv, config)
     this.getKey = new GetKey(argv, config)
     this.appUtils = new AppUtils(argv, config)
@@ -75,7 +76,7 @@ class EncryptMessage extends Command {
   async encryptAndSendMessage(flags) {
     try {
       const toAddr = flags.address
-      const msg = flags.message
+      const fileName = flags.file
 
       // Get the public key for the address from the blockchain.
       let pubKey
@@ -86,13 +87,12 @@ class EncryptMessage extends Command {
       }
       console.log(`pubKey found: `, pubKey)
 
+      const filePath = `${_this.inputPath}/${fileName}.zip`
+
       // Encrypt the message with the public key.
       const pubKeyBuf = Buffer.from(pubKey, "hex")
-      const bufferedMessage = Buffer.from(msg)
-      const structuredEj = await this.eccrypto.encrypt(
-        pubKeyBuf,
-        bufferedMessage
-      )
+      const bufferedFile = await _this.getBufferFromFile(filePath)
+      const structuredEj = await this.eccrypto.encrypt(pubKeyBuf, bufferedFile)
       // console.log(`structuredEj: ${JSON.stringify(structuredEj, null, 2)}`)
 
       // Serialize the encrypted data object
@@ -107,7 +107,7 @@ class EncryptMessage extends Command {
       // Generate a JSON object to upload to IPFS.
       const exportData = {
         toAddr: toAddr,
-        encryptedMessage: encryptedStr
+        encryptedFile: encryptedStr
       }
 
       // Write the JSON object to a JSON file.
@@ -398,10 +398,10 @@ class EncryptMessage extends Command {
     if (!name || name === "")
       throw new Error(`You must specify a wallet with the -n flag.`)
 
-    const message = flags.message
-    if (!message || message === "") {
+    const file = flags.file
+    if (!file || file === "") {
       throw new Error(
-        `You must specify a message with the -m flag. Enclose the message in double quotes.`
+        `You must specify a file path with the -f flag. Enclose the file path in double quotes.`
       )
     }
 
@@ -435,6 +435,27 @@ class EncryptMessage extends Command {
       }
     })
   }
+  //Gets the buffer of a file
+  async getBufferFromFile(inputPath) {
+    return new Promise(function(resolve, reject) {
+      try {
+        if (!_this.fs.existsSync(inputPath))
+          throw new Error(`no such file or directory ${inputPath}`)
+
+        _this.fs.readFile(inputPath, function(err, buffer) {
+          if (err) {
+            console.error(`Error while trying to read file.`)
+            return reject(err)
+          }
+          return resolve(buffer)
+        })
+      } catch (err) {
+        console.log(err)
+        console.error(`Error in getBufferFromFile.`)
+        return reject(err)
+      }
+    })
+  }
 
   // Delete the file that was generate with writeObject.
   deleteFile(filename) {
@@ -463,10 +484,9 @@ EncryptMessage.flags = {
     description: "BCH address to find public key for"
   }),
 
-  message: flags.string({
-    char: "m",
-    description:
-      "The message you want to encrypt and send. Wrap in double quotes."
+  file: flags.string({
+    char: "f",
+    description: "The file you want to encrypt and send. Wrap in double quotes."
   }),
 
   name: flags.string({ char: "n", description: "Name of wallet" })

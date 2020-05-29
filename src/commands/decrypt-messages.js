@@ -19,6 +19,7 @@ const AppUtils = require("../util")
 const GetKey = require("./get-key")
 
 const config = require("../../config")
+const fs = require("fs")
 
 // Mainnet by default.
 const bchjs = new config.BCHLIB({
@@ -37,6 +38,7 @@ class DecryptMessages extends Command {
     this.bchjs = bchjs
     this.eccrypto = eccrypto
     this.wif = wif
+    this.fs = fs
 
     this.appUtils = new AppUtils()
     this.getKey = new GetKey(argv, config)
@@ -97,8 +99,10 @@ class DecryptMessages extends Command {
       // Decrypt the message
       const decryptedMsg = await this.decryptMsg(ipfsObj, encryptionInfo)
 
-      console.log(`Decrypted message:`)
-      console.log(decryptedMsg)
+      //Write file from buffer
+      const serialNum = Math.floor(100000000 * Math.random())
+      await _this.writeFile(serialNum, decryptedMsg)
+      console.log("File downloaded successfully!")
     } catch (err) {
       console.error(`Error in getAndDecryptMessages()`)
       throw err
@@ -111,9 +115,11 @@ class DecryptMessages extends Command {
       // Generate a private key from the WIF for decrypting the data.
       const privKeyBuf = _this.wif.decode(encryptionInfo.privKey).privateKey
       // console.log(`private key: ${privKeyBuf.toString("hex")}`)
+      if (!ipfsObj.encryptedFile)
+        throw new Error("ipfsObj.encryptedFile not found")
 
       // Convert the hex encoded message to a buffer
-      const msgBuf = Buffer.from(ipfsObj.encryptedMessage, "hex")
+      const msgBuf = Buffer.from(ipfsObj.encryptedFile, "hex")
 
       // Convert the bufer into a structured object.
       const structData = _this.convertToEncryptStruct(msgBuf)
@@ -123,7 +129,7 @@ class DecryptMessages extends Command {
       // _this.log("Decrypted message:")
       // _this.log(fileBuf.toString())
 
-      return fileBuf.toString()
+      return fileBuf
     } catch (err) {
       console.error(`Error in decryptMsg()`)
       throw err
@@ -237,6 +243,27 @@ class DecryptMessages extends Command {
       throw new Error(`You must specify a wallet with the -n flag.`)
 
     return true
+  }
+  writeFile(fileName, buffer) {
+    return new Promise(function(resolve, reject) {
+      try {
+        // Generate a random filename.
+        const path = `${__dirname}/../../packaged-files/${fileName}`
+        _this.fs.writeFile(path, buffer, function(err) {
+          if (err) {
+            console.error(`Error while trying to write ${fileName} file.`)
+            return reject(err)
+          }
+          // console.log(`${fileName} written successfully!`)
+          return resolve(fileName)
+        })
+      } catch (err) {
+        console.error(
+          `Error trying to write out ${fileName} file in writeObject.`
+        )
+        return reject(err)
+      }
+    })
   }
 }
 
