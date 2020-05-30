@@ -246,7 +246,7 @@ class EncryptMessage extends Command {
           throw new Error(`no such  directory ${path}`)
 
         const _path = _this.path.resolve(path)
-        _this.fs.rmdir(_path, { recursive: true }, function(err) {
+        _this.fs.rmdir(_path, { recursive: true }, err => {
           if (err) {
             console.log("An error occured while remove the folder.")
             return reject(err)
