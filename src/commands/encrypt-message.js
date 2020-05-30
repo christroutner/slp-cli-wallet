@@ -209,7 +209,7 @@ class EncryptMessage extends Command {
       const utxo = _this.findBiggestUtxo(utxos.utxos)
       // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
-      if (!utxo) throw new Error(`Could not isolate utxo!`)
+      if (!utxo) throw new Error(`Could not find a utxo!`)
 
       // instance of transaction builder
       const transactionBuilder = new _this.bchjs.TransactionBuilder()
