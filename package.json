@@ -18,7 +18,8 @@
     "eccrypto-js": "^5.2.0",
     "qrcode-terminal": "^0.12.0",
     "shelljs": "^0.8.2",
-    "wif": "^2.0.6"
+    "wif": "^2.0.6",
+    "zip-folder": "^1.0.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.19.5",
