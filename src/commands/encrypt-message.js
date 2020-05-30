@@ -9,7 +9,7 @@ const config = require("../../config")
 
 const eccrypto = require("eccrypto-js")
 const fs = require("fs")
-
+const path = require("path")
 const AppUtils = require("../util")
 const GetPubKey = require("./get-pubkey")
 const GetKey = require("./get-key")
@@ -36,6 +36,7 @@ class EncryptMessage extends Command {
     this.getPubKey = new GetPubKey(argv, config)
     this.getKey = new GetKey(argv, config)
     this.appUtils = new AppUtils(argv, config)
+    this.path = path
 
     _this = this
   }
@@ -76,7 +77,6 @@ class EncryptMessage extends Command {
   async encryptAndSendMessage(flags) {
     try {
       const toAddr = flags.address
-      const fileName = flags.file
 
       // Get the public key for the address from the blockchain.
       let pubKey
@@ -87,6 +87,7 @@ class EncryptMessage extends Command {
       }
       console.log(`pubKey found: `, pubKey)
 
+      const fileName = _this.getFileNameFromPath(flags.file)
       const filePath = `${_this.inputPath}/${fileName}.zip`
 
       // Encrypt the message with the public key.
@@ -464,6 +465,22 @@ class EncryptMessage extends Command {
     } catch (err) {
       console.error(`Error in deleteFile()`)
       throw err
+    }
+  }
+
+  // Get file name from path
+  getFileNameFromPath(path) {
+    try {
+      if (!path || typeof path !== "string")
+        throw new Error("path must be a string")
+
+      const _path = _this.path.resolve(path)
+      const extension = _this.path.extname(_path)
+      const name = _this.path.basename(_path, extension)
+
+      return name
+    } catch (error) {
+      throw error
     }
   }
 }
