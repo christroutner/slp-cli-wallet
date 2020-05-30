@@ -202,7 +202,7 @@ describe("package-files", () => {
 
       assert.equal(exitsFile, true)
       assert.equal(filePathResult, `${outputPath}/${fileName}`)
-      //deleteFile(filePathResult)
+      deleteFile(filePathResult)
     })
   })
 
@@ -277,16 +277,16 @@ describe("package-files", () => {
       }
     })
 
-    it("should remove file or folder.", async () => {
-      const fileName = "package-lock.json"
-      const outputPath = `${packagedFilesPath}/${fileName}`
+    // it("should remove file or folder.", async () => {
+    //   const fileName = "package-lock.json"
+    //   const outputPath = `${packagedFilesPath}/${fileName}`
 
-      const result = await packageFiles.deleteFolderRecursive(outputPath)
+    //   const result = await packageFiles.deleteFolderRecursive(outputPath)
 
-      const exitsFile = fs.existsSync(outputPath)
+    //   const exitsFile = fs.existsSync(outputPath)
 
-      assert.equal(result, true)
-      assert.equal(exitsFile, false)
-    })
+    //   assert.equal(result, true)
+    //   assert.equal(exitsFile, false)
+    // })
   })
 })
