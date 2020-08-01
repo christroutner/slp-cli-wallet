@@ -142,6 +142,18 @@ const utxos = {
   scriptPubKey: "76a914fbc8766434a0d6fee839380f1c44862b57e19b8388ac"
 }
 
+const ElectrumXTransactionsResponse = {
+  success: true,
+  transactions: [],
+  catch: sinon.stub()
+}
+
+const ElectrumXBalanceResponse = {
+  success: true,
+  balancec: { confirmed: 0, unconfirmed: 0 },
+  catch: sinon.stub()
+}
+
 class mockTransactionBuilder {
   constructor() {
     this.hashTypes = {
@@ -210,6 +222,10 @@ const bitboxMock = {
     fromWIF: sinon.stub().returns({}),
     toCashAddress: sinon.stub().returns({}),
     toPublicKey: sinon.stub().returns({})
+  },
+  Electrumx: {
+    transactions: sinon.stub().returns(ElectrumXTransactionsResponse),
+    balance: sinon.stub().returns(ElectrumXBalanceResponse)
   }
 }
 
