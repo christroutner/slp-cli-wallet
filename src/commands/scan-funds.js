@@ -6,6 +6,11 @@
   145 - BIP44 standard path for Bitcoin Cash
   245 - BIP44 standard path for SLP tokens
   0 - Used by common software like the Bitcoin.com wallet and Honest.cash
+
+  TODO:
+  - Currently makes one API call to Electrumx API endpoint per address. This
+  command would be greatly improved if the bulk endpoint was used to retrieve
+  20 addresses at a time.
 */
 
 'use strict'
@@ -41,11 +46,13 @@ class ScanFunds extends Command {
 
       // Loop through each derivation in the array.
       this.derivePathes.forEach(derivePath => {
+        // Scan each derivation path for addresses with a transaction history.
         this.scanDerivationPath(masterHDNode, derivePath).then(
           addressesWithHistory => {
             if (addressesWithHistory.length === 0) {
               console.log(`No history found on derivation path ${derivePath}`)
             } else {
+              // Display each address found with a transaction history.
               addressesWithHistory.forEach(element => {
                 console.log(
                   `${element.address} - confirmed balance: ${element.balance.confirmed} unconfirmed balance: ${element.balance.unconfirmed}`
@@ -63,7 +70,8 @@ class ScanFunds extends Command {
     }
   }
 
-  // Generates a child HDNode from masterHDNode using derivePath
+  // Generates a child HDNode from masterHDNode using derivePath.
+  // Returns the BCH address for that child HDNode.
   generateDerivedAddress (masterHDNode, derivePath) {
     try {
       const derivedHDNode = this.BCHJS.HDNode.derivePath(
@@ -77,20 +85,26 @@ class ScanFunds extends Command {
     }
   }
 
-  // Queries ElectrumX for transaction history of address, if existed, gets address balance too
+  // Queries ElectrumX for transaction history of address, if existed, gets
+  // address balance too.
   async addressHasTransactionHistoryBalance (address) {
     try {
       let balance = { confirmed: 0, unconfirmed: 0 }
+
+      // Get transaction history for the address.
       const transactions = await this.BCHJS.Electrumx.transactions(
         address
       ).catch(err => {
         console.log(err)
       })
+
       let hasHistory
       if (transactions) {
         hasHistory =
           transactions.success && transactions.transactions.length > 0
       }
+
+      // If a transaction history is detected, get the balance for the address.
       if (hasHistory) {
         const balanceData = await this.BCHJS.Electrumx.balance(address).catch(
           err => {
@@ -99,6 +113,7 @@ class ScanFunds extends Command {
         )
         balance = balanceData.balance
       }
+
       return { hasHistory: hasHistory, balance: balance }
     } catch (err) {
       console.log('Error in addressHasTransactionHistoryBalance()')
@@ -107,20 +122,27 @@ class ScanFunds extends Command {
   }
 
   // Scans the derivePath children in groups of 20 addresses, until one group
-  // has no history
+  // has no history.
+  // Returns an array of objects. Each object contains an addresses with a
+  // transaction history and balance.
   async scanDerivationPath (masterHDNode, derivePath) {
     try {
       console.log(`Scanning derivation path ${derivePath}...`)
+
       const addressesWithHistory = []
+
+      // Scan 20 addresses for balances.
       let limit = 20
       for (let index = 0; index <= limit; index++) {
         const derivedChildPath = `${derivePath}/${index}`
 
+        // Generate a BCH address.
         const derivedChildAdress = this.generateDerivedAddress(
           masterHDNode,
           derivedChildPath
         )
 
+        // Check for a transaction history for the address.
         const historyBalanceData = await this.addressHasTransactionHistoryBalance(
           derivedChildAdress
         )
@@ -133,6 +155,7 @@ class ScanFunds extends Command {
           limit += 20
         }
       }
+
       return addressesWithHistory
     } catch (err) {
       console.log('Error in scanDerivationPath()')
@@ -144,10 +167,14 @@ class ScanFunds extends Command {
   validateFlags (flags) {
     // Exit if mnemonic phrase not specified.
     const mnemonic = flags.mnemonic
-    if (!mnemonic || mnemonic === '') { throw new Error('You must specify a mnemonic phrase with the -m flag.') }
+    if (!mnemonic || mnemonic === '') {
+      throw new Error('You must specify a mnemonic phrase with the -m flag.')
+    }
 
     // Exit if number of mnemonic words is not 12.
-    if (mnemonic.split(' ').length !== 12) { throw new Error('You must specify a mnemonic phrase of 12 words.') }
+    if (mnemonic.split(' ').length !== 12) {
+      throw new Error('You must specify a mnemonic phrase of 12 words.')
+    }
 
     return true
   }
