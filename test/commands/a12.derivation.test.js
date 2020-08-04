@@ -1,25 +1,24 @@
 /*
   TODO:
 
-
 */
 
-"use strict"
+'use strict'
 
-const assert = require("chai").assert
-const sinon = require("sinon")
+const assert = require('chai').assert
+const sinon = require('sinon')
 
 // Library under test.
-const Derivation = require("../../src/commands/derivation")
-const config = require("../../config")
+const Derivation = require('../../src/commands/derivation')
+// const config = require('../../config')
 
 // Mock data
-const testwallet = require("../mocks/testwallet.json")
-const { bitboxMock } = require("../mocks/bitbox")
-const utilMocks = require("../mocks/util")
+const testwallet = require('../mocks/testwallet.json')
+const { bitboxMock } = require('../mocks/bitbox')
+// const utilMocks = require('../mocks/util')
 
 // Inspect utility used for debugging.
-const util = require("util")
+const util = require('util')
 util.inspect.defaultOptions = {
   showHidden: true,
   colors: true,
@@ -27,9 +26,9 @@ util.inspect.defaultOptions = {
 }
 
 // Set default environment variables for unit tests.
-if (!process.env.TEST) process.env.TEST = "unit"
+if (!process.env.TEST) process.env.TEST = 'unit'
 
-describe("#derivation", () => {
+describe('#derivation', () => {
   let BITBOX
   let mockedWallet
   let derivation
@@ -50,23 +49,23 @@ describe("#derivation", () => {
     sandbox.restore()
   })
 
-  describe("#validateFlags", () => {
-    it("should throw error if name is not supplied.", () => {
+  describe('#validateFlags', () => {
+    it('should throw error if name is not supplied.', () => {
       try {
         derivation.validateFlags({})
       } catch (err) {
         assert.include(
           err.message,
-          `You must specify a wallet with the -n flag`,
-          "Expected error message."
+          'You must specify a wallet with the -n flag',
+          'Expected error message.'
         )
       }
     })
 
-    it("should throw error is save flag is specified without argument", () => {
+    it('should throw error is save flag is specified without argument', () => {
       try {
         const flags = {
-          name: `testwallet`,
+          name: 'testwallet',
           save: undefined
         }
 
@@ -74,42 +73,42 @@ describe("#derivation", () => {
       } catch (err) {
         assert.include(
           err.message,
-          `Flag --save expects a value`,
-          "Expected error message."
+          'Flag --save expects a value',
+          'Expected error message.'
         )
       }
     })
 
-    it("should throw error if save argument is not an integer", () => {
+    it('should throw error if save argument is not an integer', () => {
       try {
         const flags = {
-          name: `testwallet`,
-          save: `abc`
+          name: 'testwallet',
+          save: 'abc'
         }
 
         derivation.validateFlags(flags)
       } catch (err) {
         assert.include(
           err.message,
-          `Derivation path must be an integer`,
-          "Expected error message."
+          'Derivation path must be an integer',
+          'Expected error message.'
         )
       }
     })
   })
 
-  describe("#saveDerivation", () => {
-    it("should save the new derivation path to the wallet file", () => {
+  describe('#saveDerivation', () => {
+    it('should save the new derivation path to the wallet file', () => {
       const filename = `${__dirname}/../../wallets/test123.json`
 
       const flags = {
-        name: `test123`,
-        save: `145`
+        name: 'test123',
+        save: '145'
       }
 
       const result = derivation.saveDerivation(flags, filename, mockedWallet)
 
-      assert.equal(result, true, "Successful save expected")
+      assert.equal(result, true, 'Successful save expected')
     })
   })
 

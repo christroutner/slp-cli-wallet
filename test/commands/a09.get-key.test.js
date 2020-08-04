@@ -2,21 +2,21 @@
   TODO:
 */
 
-"use strict"
+'use strict'
 
-const assert = require("chai").assert
+const assert = require('chai').assert
 
-const CreateWallet = require("../../src/commands/create-wallet")
-const GetKey = require("../../src/commands/get-key")
-const config = require("../../config")
+const CreateWallet = require('../../src/commands/create-wallet')
+const GetKey = require('../../src/commands/get-key')
+const config = require('../../config')
 
-const { bitboxMock } = require("../mocks/bitbox")
-const fs = require("fs")
+const { bitboxMock } = require('../mocks/bitbox')
+const fs = require('fs')
 
 const filename = `${__dirname}/../../wallets/test123.json`
 
 // Inspect utility used for debugging.
-const util = require("util")
+const util = require('util')
 util.inspect.defaultOptions = {
   showHidden: true,
   colors: true,
@@ -24,7 +24,7 @@ util.inspect.defaultOptions = {
 }
 
 // Set default environment variables for unit tests.
-if (!process.env.TEST) process.env.TEST = "unit"
+if (!process.env.TEST) process.env.TEST = 'unit'
 const deleteFile = () => {
   const prom = new Promise((resolve, reject) => {
     fs.unlink(filename, () => {
@@ -33,7 +33,7 @@ const deleteFile = () => {
   })
   return prom
 }
-describe("get-key", () => {
+describe('get-key', () => {
   let BITBOX
   let getKey
 
@@ -47,47 +47,46 @@ describe("get-key", () => {
   })
 
   // getKey can be called directly by other programs, so this is tested separately.
-  it("getKey should throw error if name is not supplied.", async () => {
+  it('getKey should throw error if name is not supplied.', async () => {
     try {
       await getKey.getPair(undefined)
     } catch (err) {
-      assert.include(err.message, `Could not open`, "Expected error message.")
+      assert.include(err.message, 'Could not open', 'Expected error message.')
     }
   })
 
   // This validation function is called when the program is executed from the command line.
-  it("validateFlags() should throw error if name is not supplied.", () => {
+  it('validateFlags() should throw error if name is not supplied.', () => {
     try {
       getKey.validateFlags({})
     } catch (err) {
       assert.include(
         err.message,
-        `You must specify a wallet with the -n flag`,
-        "Expected error message."
+        'You must specify a wallet with the -n flag',
+        'Expected error message.'
       )
     }
   })
 
-  it("should throw error if wallet file not found.", async () => {
+  it('should throw error if wallet file not found.', async () => {
     try {
-      await getKey.getPair(`doesnotexist`)
+      await getKey.getPair('doesnotexist')
     } catch (err) {
-      assert.include(err.message, `Could not open`, "Expected error message.")
+      assert.include(err.message, 'Could not open', 'Expected error message.')
     }
   })
 
-  it("increments the nextAddress property of the wallet.", async () => {
+  it('increments the nextAddress property of the wallet.', async () => {
     // Use the real library if this is not a unit test
-    if (process.env.TEST !== "unit")
-      getKey.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+    if (process.env.TEST !== 'unit') { getKey.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST }) }
 
     // Create a testnet wallet
     const createWallet = new CreateWallet()
     const initialWalletInfo = await createWallet.createWallet(
       filename,
-      "testnet"
+      'testnet'
     )
-    //console.log(`initialWalletInfo: ${util.inspect(initialWalletInfo)}`)
+    // console.log(`initialWalletInfo: ${util.inspect(initialWalletInfo)}`)
 
     // Record the initial nextAddress property. This is going to be 1 for a new wallet.
     const firstAddressIndex = initialWalletInfo.nextAddress
@@ -96,16 +95,16 @@ describe("get-key", () => {
     await getKey.getPair(filename)
 
     // Delete the cached copy of the wallet. This allows testing of list-wallets.
-    delete require.cache[require.resolve(`../../wallets/test123`)]
+    delete require.cache[require.resolve('../../wallets/test123')]
 
     // Read in the wallet file.
-    const walletInfo = require(`../../wallets/test123`)
-    //console.log(`walletInfo: ${util.inspect(walletInfo)}`)
+    const walletInfo = require('../../wallets/test123')
+    // console.log(`walletInfo: ${util.inspect(walletInfo)}`)
 
     assert.equal(
       walletInfo.nextAddress,
       firstAddressIndex + 1,
-      "nextAddress property should increment"
+      'nextAddress property should increment'
     )
   })
 })

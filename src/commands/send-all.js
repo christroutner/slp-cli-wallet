@@ -23,12 +23,12 @@
   tokens first, then send BCH.
 */
 
-"use strict"
+'use strict'
 
-const UpdateBalances = require("./update-balances")
-const config = require("../../config")
+const UpdateBalances = require('./update-balances')
+const config = require('../../config')
 
-const AppUtils = require("../util")
+const AppUtils = require('../util')
 const appUtils = new AppUtils()
 
 // Mainnet by default
@@ -38,20 +38,20 @@ const BITBOX = new config.BCHLIB({
 })
 
 // Used for debugging and error reporting.
-const util = require("util")
+const util = require('util')
 util.inspect.defaultOptions = { depth: 2 }
 
-const { Command, flags } = require("@oclif/command")
+const { Command, flags } = require('@oclif/command')
 
 class SendAll extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
-    //_this = this
+    // _this = this
 
     this.BITBOX = BITBOX
   }
 
-  async run() {
+  async run () {
     try {
       const { flags } = this.parse(SendAll)
 
@@ -67,7 +67,7 @@ class SendAll extends Command {
       walletInfo.name = name
 
       // Determine if this is a testnet wallet or a mainnet wallet.
-      if (walletInfo.network === "testnet") {
+      if (walletInfo.network === 'testnet') {
         this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
         appUtils.BITBOX = this.BITBOX
       }
@@ -79,7 +79,7 @@ class SendAll extends Command {
 
       // Get all UTXOs controlled by this wallet.
       const utxos = await appUtils.getUTXOs(walletInfo)
-      //console.log(`utxos: ${util.inspect(utxos)}`)
+      // console.log(`utxos: ${util.inspect(utxos)}`)
 
       // Send the BCH, transfer change to the new address
       const hex = await this.sendAllBCH(utxos, sendToAddr, walletInfo)
@@ -89,37 +89,37 @@ class SendAll extends Command {
       console.log(`TXID: ${txid}`)
 
       // Display link to block explorer.
-      console.log(`View on block explorer:`)
-      if (walletInfo.network === "testnet")
+      console.log('View on block explorer:')
+      if (walletInfo.network === 'testnet') {
         console.log(`https://explorer.bitcoin.com/tbch/tx/${txid}`)
-      else console.log(`https://explorer.bitcoin.com/bch/tx/${txid}`)
+      } else console.log(`https://explorer.bitcoin.com/bch/tx/${txid}`)
     } catch (err) {
-      //if (err.message) console.log(err.message)
-      //else console.log(`Error in .run: `, err)
-      console.log(`Error in send-all.js/run: `, err)
+      // if (err.message) console.log(err.message)
+      // else console.log(`Error in .run: `, err)
+      console.log('Error in send-all.js/run: ', err)
     }
   }
 
   // Sends all BCH in a wallet to a new address.
-  async sendAllBCH(utxos, sendToAddr, walletInfo) {
+  async sendAllBCH (utxos, sendToAddr, walletInfo) {
     try {
-      //console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
-      if (!Array.isArray(utxos)) throw new Error(`utxos must be an array.`)
+      if (!Array.isArray(utxos)) throw new Error('utxos must be an array.')
 
-      if (utxos.length === 0) throw new Error(`No utxos found.`)
+      if (utxos.length === 0) throw new Error('No utxos found.')
 
       // instance of transaction builder
       let transactionBuilder
-      if (walletInfo.network === `testnet`)
-        transactionBuilder = new this.BITBOX.TransactionBuilder("testnet")
-      else transactionBuilder = new this.BITBOX.TransactionBuilder()
+      if (walletInfo.network === 'testnet') {
+        transactionBuilder = new this.BITBOX.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.BITBOX.TransactionBuilder()
 
       let originalAmount = 0
 
       // Calulate the original amount in the wallet and add all UTXOs to the
       // transaction builder.
-      for (var i = 0; i < utxos.length; i++) {
+      for (let i = 0; i < utxos.length; i++) {
         const utxo = utxos[i]
 
         originalAmount = originalAmount + utxo.satoshis
@@ -127,11 +127,12 @@ class SendAll extends Command {
         transactionBuilder.addInput(utxo.txid, utxo.vout)
       }
 
-      if (originalAmount < 1)
-        throw new Error(`Original amount is zero. No BCH to send.`)
+      if (originalAmount < 1) {
+        throw new Error('Original amount is zero. No BCH to send.')
+      }
 
       // original amount of satoshis in vin
-      //console.log(`originalAmount: ${originalAmount}`)
+      // console.log(`originalAmount: ${originalAmount}`)
 
       // get byte count to calculate fee. paying 1 sat/byte
       const byteCount = this.BITBOX.BitcoinCash.getByteCount(
@@ -139,11 +140,11 @@ class SendAll extends Command {
         { P2PKH: 1 }
       )
       const fee = Math.ceil(1.1 * byteCount)
-      //console.log(`fee: ${byteCount}`)
+      // console.log(`fee: ${byteCount}`)
 
       // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
       const sendAmount = originalAmount - fee
-      //console.log(`sendAmount: ${sendAmount}`)
+      // console.log(`sendAmount: ${sendAmount}`)
 
       // add output w/ address and amount to send
       transactionBuilder.addOutput(
@@ -154,7 +155,7 @@ class SendAll extends Command {
       let redeemScript
 
       // Loop through each input and sign
-      for (var i = 0; i < utxos.length; i++) {
+      for (let i = 0; i < utxos.length; i++) {
         const utxo = utxos[i]
 
         // Generate a keypair for the current address.
@@ -178,25 +179,27 @@ class SendAll extends Command {
 
       // output rawhex
       const hex = tx.toHex()
-      //console.log(`Transaction raw hex: ${hex}`)
+      // console.log(`Transaction raw hex: ${hex}`)
 
       return hex
     } catch (err) {
-      console.log(`Error in sendAllBCH()`)
+      console.log('Error in sendAllBCH()')
       throw err
     }
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === "")
-      throw new Error(`You must specify a wallet with the -n flag.`)
+    if (!name || name === '') {
+      throw new Error('You must specify a wallet with the -n flag.')
+    }
 
     const sendAddr = flags.sendAddr
-    if (!sendAddr || sendAddr === "")
-      throw new Error(`You must specify a send-to address with the -a flag.`)
+    if (!sendAddr || sendAddr === '') {
+      throw new Error('You must specify a send-to address with the -a flag.')
+    }
 
     return true
   }
@@ -212,11 +215,11 @@ https://bit.ly/2TnhdVc
 `
 
 SendAll.flags = {
-  name: flags.string({ char: "n", description: "Name of wallet" }),
-  sendAddr: flags.string({ char: "a", description: "Cash address to send to" }),
+  name: flags.string({ char: 'n', description: 'Name of wallet' }),
+  sendAddr: flags.string({ char: 'a', description: 'Cash address to send to' }),
   ignoreTokens: flags.boolean({
-    char: "i",
-    description: "Ignore and burn tokens"
+    char: 'i',
+    description: 'Ignore and burn tokens'
   })
 }
 

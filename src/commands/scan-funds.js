@@ -8,16 +8,16 @@
   0 - Used by common software like the Bitcoin.com wallet and Honest.cash
 */
 
-"use strict"
+'use strict'
 
-const config = require("../../config")
+const config = require('../../config')
 // Mainnet.
 const BCHJS = new config.BCHLIB({ restURL: config.MAINNET_REST })
 
-const { Command, flags } = require("@oclif/command")
+const { Command, flags } = require('@oclif/command')
 
 class ScanFunds extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     this.BCHJS = BCHJS
@@ -29,7 +29,7 @@ class ScanFunds extends Command {
     ]
   }
 
-  async run() {
+  async run () {
     try {
       const { flags } = this.parse(ScanFunds)
 
@@ -39,6 +39,7 @@ class ScanFunds extends Command {
       const rootSeed = await this.BCHJS.Mnemonic.toSeed(flags.mnemonic)
       const masterHDNode = this.BCHJS.HDNode.fromSeed(rootSeed)
 
+      // Loop through each derivation in the array.
       this.derivePathes.forEach(derivePath => {
         this.scanDerivationPath(masterHDNode, derivePath).then(
           addressesWithHistory => {
@@ -56,14 +57,14 @@ class ScanFunds extends Command {
       })
     } catch (err) {
       if (err.message) console.log(err.message)
-      else console.log(`Error in .run: `, err)
-      //console.log(`Error in scan-funds.js/run: `, err)
+      else console.log('Error in .run: ', err)
+      // console.log(`Error in scan-funds.js/run: `, err)
       throw err
     }
   }
 
   // Generates a child HDNode from masterHDNode using derivePath
-  generateDerivedAddress(masterHDNode, derivePath) {
+  generateDerivedAddress (masterHDNode, derivePath) {
     try {
       const derivedHDNode = this.BCHJS.HDNode.derivePath(
         masterHDNode,
@@ -71,13 +72,13 @@ class ScanFunds extends Command {
       )
       return this.BCHJS.HDNode.toCashAddress(derivedHDNode)
     } catch (err) {
-      console.log("Error in generateDerivedAddress()")
+      console.log('Error in generateDerivedAddress()')
       throw err
     }
   }
 
   // Queries ElectrumX for transaction history of address, if existed, gets address balance too
-  async addressHasTransactionHistoryBalance(address) {
+  async addressHasTransactionHistoryBalance (address) {
     try {
       let balance = { confirmed: 0, unconfirmed: 0 }
       const transactions = await this.BCHJS.Electrumx.transactions(
@@ -100,16 +101,17 @@ class ScanFunds extends Command {
       }
       return { hasHistory: hasHistory, balance: balance }
     } catch (err) {
-      console.log("Error in addressHasTransactionHistoryBalance()")
+      console.log('Error in addressHasTransactionHistoryBalance()')
       throw err
     }
   }
 
-  // Scans the derivePath children in groups of 20 addresses, until one group has no history
-  async scanDerivationPath(masterHDNode, derivePath) {
+  // Scans the derivePath children in groups of 20 addresses, until one group
+  // has no history
+  async scanDerivationPath (masterHDNode, derivePath) {
     try {
       console.log(`Scanning derivation path ${derivePath}...`)
-      let addressesWithHistory = []
+      const addressesWithHistory = []
       let limit = 20
       for (let index = 0; index <= limit; index++) {
         const derivedChildPath = `${derivePath}/${index}`
@@ -133,21 +135,19 @@ class ScanFunds extends Command {
       }
       return addressesWithHistory
     } catch (err) {
-      console.log("Error in scanDerivationPath()")
+      console.log('Error in scanDerivationPath()')
       throw err
     }
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if mnemonic phrase not specified.
     const mnemonic = flags.mnemonic
-    if (!mnemonic || mnemonic === "")
-      throw new Error(`You must specify a mnemonic phrase with the -m flag.`)
+    if (!mnemonic || mnemonic === '') { throw new Error('You must specify a mnemonic phrase with the -m flag.') }
 
     // Exit if number of mnemonic words is not 12.
-    if (mnemonic.split(" ").length !== 12)
-      throw new Error(`You must specify a mnemonic phrase of 12 words.`)
+    if (mnemonic.split(' ').length !== 12) { throw new Error('You must specify a mnemonic phrase of 12 words.') }
 
     return true
   }
@@ -166,8 +166,8 @@ Derivation pathes used:
 
 ScanFunds.flags = {
   mnemonic: flags.string({
-    char: "m",
-    description: "mnemonic phrase to generate addresses, wrapped in quotes"
+    char: 'm',
+    description: 'mnemonic phrase to generate addresses, wrapped in quotes'
   })
 }
 
