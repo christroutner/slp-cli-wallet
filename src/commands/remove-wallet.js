@@ -1,11 +1,11 @@
-"use strict"
+'use strict'
 
-const shelljs = require("shelljs")
+const shelljs = require('shelljs')
 
-const { Command, flags } = require("@oclif/command")
+const { Command, flags } = require('@oclif/command')
 
 class RemoveWallet extends Command {
-  async run() {
+  async run () {
     try {
       const { flags } = this.parse(RemoveWallet)
 
@@ -16,34 +16,33 @@ class RemoveWallet extends Command {
 
       this.removeWallet(filename)
     } catch (err) {
-      console.log(`Error: `, err)
+      console.log('Error: ', err)
     }
   }
 
-  async removeWallet(filename) {
+  async removeWallet (filename) {
     try {
       shelljs.rm(filename)
     } catch (err) {
-      if (err.code !== "EEXIT") console.log(`Error in removeWallet().`)
+      if (err.code !== 'EEXIT') console.log('Error in removeWallet().')
       throw err
     }
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === "")
-      throw new Error(`You must specify a wallet with the -n flag.`)
+    if (!name || name === '') { throw new Error('You must specify a wallet with the -n flag.') }
 
     return true
   }
 }
 
-RemoveWallet.description = `Remove an existing wallet.`
+RemoveWallet.description = 'Remove an existing wallet.'
 
 RemoveWallet.flags = {
-  name: flags.string({ char: "n", description: "Name of wallet" })
+  name: flags.string({ char: 'n', description: 'Name of wallet' })
 }
 
 module.exports = RemoveWallet

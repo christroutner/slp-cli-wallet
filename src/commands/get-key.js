@@ -8,14 +8,14 @@
   wallet .json file.
 */
 
-"use strict"
+'use strict'
 
-const qrcode = require("qrcode-terminal")
+const qrcode = require('qrcode-terminal')
 
-const AppUtils = require("../util")
+const AppUtils = require('../util')
 const appUtils = new AppUtils()
 
-const config = require("../../config")
+const config = require('../../config')
 
 // Mainnet by default.
 const BITBOX = new config.BCHLIB({
@@ -24,21 +24,21 @@ const BITBOX = new config.BCHLIB({
 })
 
 // Used for debugging and iterrogating JS objects.
-const util = require("util")
+const util = require('util')
 util.inspect.defaultOptions = { depth: 2 }
 
-const { Command, flags } = require("@oclif/command")
+const { Command, flags } = require('@oclif/command')
 
-//let _this
+// let _this
 
 class GetKey extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     this.BITBOX = BITBOX
   }
 
-  async run() {
+  async run () {
     try {
       const { flags } = this.parse(GetKey)
 
@@ -46,8 +46,9 @@ class GetKey extends Command {
       this.validateFlags(flags)
 
       // Determine if this is a testnet wallet or a mainnet wallet.
-      if (flags.testnet)
+      if (flags.testnet) {
         this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+      }
 
       // Generate an absolute filename from the name.
       const filename = `${__dirname}/../../wallets/${flags.name}.json`
@@ -65,33 +66,34 @@ class GetKey extends Command {
 
       // Display the address to the user.
       this.log(`${newAddress}`)
-      //this.log(`legacy address: ${legacy}`)
+      // this.log(`legacy address: ${legacy}`)
 
       const slpAddr = this.BITBOX.SLP.Address.toSLPAddress(newAddress)
       console.log(`${slpAddr}`)
     } catch (err) {
       if (err.message) console.log(err.message)
-      else console.log(`Error in GetKey.run: `, err)
+      else console.log('Error in GetKey.run: ', err)
     }
   }
 
   // Get a private/public key pair. Private key in WIF format.
-  async getPair(filename) {
+  async getPair (filename) {
     try {
-      //const filename = `${__dirname}/../../wallets/${name}.json`
+      // const filename = `${__dirname}/../../wallets/${name}.json`
       const walletInfo = appUtils.openWallet(filename)
-      //console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
+      // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
       // root seed buffer
       let rootSeed
-      if (config.RESTAPI === "bitcoin.com")
+      if (config.RESTAPI === 'bitcoin.com') {
         rootSeed = this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
-      else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
+      } else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
 
       // master HDNode
-      if (walletInfo.network === "testnet")
-        var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, "testnet")
-      else var masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
+      let masterHDNode
+      if (walletInfo.network === 'testnet') {
+        masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, 'testnet')
+      } else masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
 
       // HDNode of BIP44 account
       const account = this.BITBOX.HDNode.derivePath(
@@ -113,7 +115,7 @@ class GetKey extends Command {
 
       // get the cash address
       const newAddress = this.BITBOX.HDNode.toCashAddress(change)
-      //const legacy = BITBOX.HDNode.toLegacyAddress(change)
+      // const legacy = BITBOX.HDNode.toLegacyAddress(change)
 
       // get the private key
       const newKey = this.BITBOX.HDNode.toWIF(change)
@@ -124,29 +126,30 @@ class GetKey extends Command {
       return {
         priv: newKey,
         pub: newAddress,
-        pubKey: pubKey.toString("hex")
+        pubKey: pubKey.toString('hex')
       }
     } catch (err) {
-      console.log(`Error in getPair().`)
+      console.log('Error in getPair().')
       throw err
     }
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === "")
-      throw new Error(`You must specify a wallet with the -n flag.`)
+    if (!name || name === '') {
+      throw new Error('You must specify a wallet with the -n flag.')
+    }
 
     return true
   }
 }
 
-GetKey.description = `Generate a new private/public key pair.`
+GetKey.description = 'Generate a new private/public key pair.'
 
 GetKey.flags = {
-  name: flags.string({ char: "n", description: "Name of wallet" })
+  name: flags.string({ char: 'n', description: 'Name of wallet' })
 }
 
 module.exports = GetKey

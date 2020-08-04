@@ -6,15 +6,15 @@
   0 - Used by common software like the Bitcoin.com wallet and Honest.cash
 */
 
-"use strict"
+'use strict'
 
-const AppUtils = require("../util")
+const AppUtils = require('../util')
 const appUtils = new AppUtils()
 
-const { Command, flags } = require("@oclif/command")
+const { Command, flags } = require('@oclif/command')
 
 class Derivation extends Command {
-  async run() {
+  async run () {
     try {
       const { flags } = this.parse(Derivation)
 
@@ -37,13 +37,13 @@ class Derivation extends Command {
       }
     } catch (err) {
       if (err.message) console.log(err.message)
-      else console.log(`Error in .run: `, err)
-      //console.log(`Error in derivation.js/run: `, err)
+      else console.log('Error in .run: ', err)
+      // console.log(`Error in derivation.js/run: `, err)
     }
   }
 
   // Update the wallet file with the new derivation path.
-  saveDerivation(flags, filename, walletData) {
+  saveDerivation (flags, filename, walletData) {
     try {
       // Set the new derivation path.
       walletData.derivation = flags.save
@@ -53,25 +53,22 @@ class Derivation extends Command {
 
       return true
     } catch (err) {
-      console.log(`Error in derivation.js/saveDerivation()`)
+      console.log('Error in derivation.js/saveDerivation()')
       throw err
     }
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === "")
-      throw new Error(`You must specify a wallet with the -n flag.`)
+    if (!name || name === '') { throw new Error('You must specify a wallet with the -n flag.') }
 
     const save = flags.save
-    if (save && save === "")
-      throw new Error(`You must specify a new derivation path to save.`)
+    if (save && save === '') { throw new Error('You must specify a new derivation path to save.') }
 
     const intCheck = parseInt(save)
-    if (save && isNaN(intCheck))
-      throw new Error(`Derivation path must be an integer.`)
+    if (save && isNaN(intCheck)) { throw new Error('Derivation path must be an integer.') }
 
     return true
   }
@@ -90,8 +87,8 @@ Wallets use the 245 derivation path by default.
 `
 
 Derivation.flags = {
-  name: flags.string({ char: "n", description: "name to print" }),
-  save: flags.string({ char: "s", description: "save a new derivation path" })
+  name: flags.string({ char: 'n', description: 'name to print' }),
+  save: flags.string({ char: 's', description: 'save a new derivation path' })
 }
 
 module.exports = Derivation

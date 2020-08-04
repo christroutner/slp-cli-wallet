@@ -32,7 +32,8 @@
     "nyc": "^15.0.0",
     "prettier": "^1.18.2",
     "semantic-release": "^17.0.0",
-    "sinon": "^9.0.0"
+    "sinon": "^9.0.0",
+    "standard": "^14.3.4"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -62,13 +63,14 @@
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "TEST=unit nyc --reporter=text mocha  --timeout 25000",
+    "test": "npm run lint; TEST=unit nyc --reporter=text mocha  --timeout 25000",
     "test:integration": "RESTAPI=fullstack.cash TEST=integration nyc --reporter=text mocha  --timeout 25000",
     "test:integration:local": "RESTAPI=local TEST=integration nyc --reporter=text mocha  --timeout 25000",
     "test:integration:decatur": "RESTAPI=decatur TEST=integration nyc --reporter=text mocha  --timeout 25000",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coverage:report": "nyc --reporter=html mocha",
     "version": "oclif-dev readme && git add README.md",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "lint": "standard --env mocha --fix"
   }
 }

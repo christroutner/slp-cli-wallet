@@ -1,24 +1,24 @@
-"use strict"
+'use strict'
 
-//const fs = require("fs")
-//const BB = require("bitbox-sdk/lib/bitbox-sdk").default
+// const fs = require("fs")
+// const BB = require("bitbox-sdk/lib/bitbox-sdk").default
 
-const shelljs = require("shelljs")
-const Table = require("cli-table")
-const qrcode = require("qrcode-terminal")
+const shelljs = require('shelljs')
+const Table = require('cli-table')
+// const qrcode = require('qrcode-terminal')
 
-const util = require("util")
+const util = require('util')
 util.inspect.defaultOptions = {
   showHidden: true,
   colors: true,
   depth: 1
 }
 
-const { Command, flags } = require("@oclif/command")
+const { Command } = require('@oclif/command')
 
 class ListWallets extends Command {
-  async run() {
-    const { flags } = this.parse(ListWallets)
+  async run () {
+    // const { flags } = this.parse(ListWallets)
 
     const walletData = this.parseWallets()
 
@@ -26,12 +26,12 @@ class ListWallets extends Command {
   }
 
   // Parse data from the wallets directory into a formatted array.
-  parseWallets() {
+  parseWallets () {
     const fileList = shelljs.ls(`${__dirname}/../../wallets/*.json`)
-    //console.log(`fileList: ${JSON.stringify(fileList, null, 2)}`)
+    // console.log(`fileList: ${JSON.stringify(fileList, null, 2)}`)
 
     if (fileList.length === 0) {
-      console.log(`No wallets found.`)
+      console.log('No wallets found.')
       return []
     }
 
@@ -40,15 +40,15 @@ class ListWallets extends Command {
     // Loop through each wallet returned.
     for (let i = 0; i < fileList.length; i++) {
       const thisFile = fileList[i]
-      //console.log(`thisFile: ${thisFile}`)
+      // console.log(`thisFile: ${thisFile}`)
 
-      const lastPart = thisFile.indexOf(`.json`)
+      const lastPart = thisFile.indexOf('.json')
 
-      const lastSlash = thisFile.indexOf(`wallets/`)
-      //console.log(`lastSlash: ${lastSlash}`)
+      const lastSlash = thisFile.indexOf('wallets/')
+      // console.log(`lastSlash: ${lastSlash}`)
 
       let name = thisFile.slice(8, lastPart)
-      //console.log(`name: ${name}`)
+      // console.log(`name: ${name}`)
 
       name = name.slice(lastSlash)
 
@@ -64,9 +64,9 @@ class ListWallets extends Command {
   }
 
   // Display table in a table on the command line using cli-table.
-  displayTable(data) {
+  displayTable (data) {
     var table = new Table({
-      head: ["Name", "Network", "Balance (BCH)"],
+      head: ['Name', 'Network', 'Balance (BCH)'],
       colWidths: [25, 15, 15]
     })
 
@@ -76,11 +76,11 @@ class ListWallets extends Command {
   }
 }
 
-ListWallets.description = `List existing wallets.`
+ListWallets.description = 'List existing wallets.'
 
 ListWallets.flags = {
-  //testnet: flags.boolean({ char: "t", description: "Create a testnet wallet" }),
-  //name: flags.string({ char: "n", description: "Name of wallet" })
+  // testnet: flags.boolean({ char: "t", description: "Create a testnet wallet" }),
+  // name: flags.string({ char: "n", description: "Name of wallet" })
 }
 
 module.exports = ListWallets
