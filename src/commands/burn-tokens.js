@@ -56,6 +56,23 @@ class BurnTokens extends Command {
       // Ensure flags meet qualifiying critieria.
       this.validateFlags(flags)
 
+      const burnConfig = await this.prepBurnTokens(flags)
+
+      // Send the token, transfer change to the new address
+      const hex = await this.burnTokens(burnConfig)
+      // console.log(`hex: ${hex}`)
+
+      const txid = await appUtils.broadcastTx(hex)
+      appUtils.displayTxid(txid, burnConfig.walletInfo.network)
+    } catch (err) {
+      // if (err.message) console.log(err.message)
+      // else console.log(`Error in .run: `, err)
+      console.log('Error in burn-tokens.js/run(): ', err)
+    }
+  }
+
+  async prepBurnTokens (flags) {
+    try {
       const name = flags.name // Name of the wallet.
       const qty = flags.qty // Amount to send in BCH.
       const tokenId = flags.tokenId // SLP token ID.
@@ -119,43 +136,43 @@ class BurnTokens extends Command {
       // const burnAddress = await getAddress.getAddress(filename)
       // console.log(`burnAddress: ${burnAddress}`)
 
-      // Send the token, transfer change to the new address
-      const hex = await this.burnTokens(
+      // Return a config object.
+      return {
         utxo,
         qty,
         tokenChangeAddress,
         bchChangeAddress,
         walletInfo,
         tokenUtxos
-      )
-      // console.log(`hex: ${hex}`)
-
-      const txid = await appUtils.broadcastTx(hex)
-      appUtils.displayTxid(txid, walletInfo.network)
+      }
     } catch (err) {
-      // if (err.message) console.log(err.message)
-      // else console.log(`Error in .run: `, err)
-      console.log('Error in burn-tokens.js/run(): ', err)
+      console.error('Error in startBurnTokens()')
+      throw err
     }
   }
 
   // Spends tokens and burns the selected quantity by subtracting that amount
   // from the output. This function returns a hex string of a transaction, ready
   // to be broadcast to the network.
-  async burnTokens (
-    utxo,
-    qty,
-    tokenChangeAddress,
-    bchChangeAddress,
-    walletInfo,
-    tokenUtxos
-  ) {
+  async burnTokens (burnConfig) {
     try {
       // console.log(`utxo: ${util.inspect(utxo)}`)
 
+      // Expand the config object into separate objects.
+      const {
+        utxo,
+        qty,
+        tokenChangeAddress,
+        bchChangeAddress,
+        walletInfo,
+        tokenUtxos
+      } = burnConfig
+
       // instance of transaction builder
       let transactionBuilder
-      if (walletInfo.network === 'testnet') { transactionBuilder = new this.BITBOX.TransactionBuilder('testnet') } else transactionBuilder = new this.BITBOX.TransactionBuilder()
+      if (walletInfo.network === 'testnet') {
+        transactionBuilder = new this.BITBOX.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.BITBOX.TransactionBuilder()
 
       // const satoshisToSend = Math.floor(bch * 100000000)
       // console.log(`Amount to send in satoshis: ${satoshisToSend}`)
@@ -167,7 +184,9 @@ class BurnTokens extends Command {
       transactionBuilder.addInput(txid, vout)
 
       // add each token UTXO as an input.
-      for (let i = 0; i < tokenUtxos.length; i++) { transactionBuilder.addInput(tokenUtxos[i].txid, tokenUtxos[i].vout) }
+      for (let i = 0; i < tokenUtxos.length; i++) {
+        transactionBuilder.addInput(tokenUtxos[i].txid, tokenUtxos[i].vout)
+      }
 
       // get byte count to calculate fee. paying 1 sat
       // Note: This may not be totally accurate. Just guessing on the byteCount size.
@@ -183,7 +202,9 @@ class BurnTokens extends Command {
 
       // amount to send back to the sending address. It's the original amount - 1 sat/byte for tx size
       const remainder = originalAmount - txFee - 546 * 2
-      if (remainder < 1) { throw new Error('Selected UTXO does not have enough satoshis') }
+      if (remainder < 1) {
+        throw new Error('Selected UTXO does not have enough satoshis')
+      }
       // console.log(`remainder: ${remainder}`)
 
       // Generate the OP_RETURN entry for an SLP SEND transaction.
@@ -260,7 +281,7 @@ class BurnTokens extends Command {
 
       return hex
     } catch (err) {
-      console.log('Error in sendTokens()')
+      console.log('Error in burnTokens()', err)
       throw err
     }
   }
@@ -274,16 +295,22 @@ class BurnTokens extends Command {
       // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
       // console.log(`qty: ${qty}`)
 
-      if (!tokenUtxos || tokenUtxos.length === 0) { throw new Error('tokenUtxos array can not be empty.') }
+      if (!tokenUtxos || tokenUtxos.length === 0) {
+        throw new Error('tokenUtxos array can not be empty.')
+      }
 
-      if (!qty || qty <= 0) { throw new Error('Quantity to burn needs to be greater than zero.') }
+      if (!qty || qty <= 0) {
+        throw new Error('Quantity to burn needs to be greater than zero.')
+      }
 
       const tokenId = tokenUtxos[0].tokenId
       const decimals = tokenUtxos[0].decimals
 
       // Calculate the total amount of tokens owned by the wallet.
       let totalTokens = 0
-      for (let i = 0; i < tokenUtxos.length; i++) { totalTokens += tokenUtxos[i].tokenQty }
+      for (let i = 0; i < tokenUtxos.length; i++) {
+        totalTokens += tokenUtxos[i].tokenQty
+      }
 
       // Calculate the amount of send, which is the total minus the quantity to
       // burn.
@@ -319,13 +346,19 @@ class BurnTokens extends Command {
 
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === '') { throw new Error('You must specify a wallet with the -n flag.') }
+    if (!name || name === '') {
+      throw new Error('You must specify a wallet with the -n flag.')
+    }
 
     const qty = flags.qty
-    if (isNaN(Number(qty))) { throw new Error('You must specify a quantity of tokens with the -q flag.') }
+    if (isNaN(Number(qty))) {
+      throw new Error('You must specify a quantity of tokens with the -q flag.')
+    }
 
     const tokenId = flags.tokenId
-    if (!tokenId || tokenId === '') { throw new Error('You must specifcy the SLP token ID') }
+    if (!tokenId || tokenId === '') {
+      throw new Error('You must specifcy the SLP token ID')
+    }
 
     // check Token Id should be hexademical chracters.
     const re = /^([A-Fa-f0-9]{2}){32,32}$/

@@ -213,14 +213,16 @@ describe('#burn-tokens', () => {
       const sendToAddr =
         'bitcoincash:qp72leshv5h4uw8nj500ljwjqq6tqxgsguduwe9zz8'
 
-      const hex = await burnTokens.burnTokens(
-        burnMocks.bchUtxo,
-        1,
-        sendToAddr,
-        sendToAddr,
-        mockedWallet,
-        burnMocks.tokenUtxo
-      )
+      const burnConfig = {
+        utxo: burnMocks.bchUtxo,
+        qty: 1,
+        tokenChangeAddress: sendToAddr,
+        bchChangeAddress: sendToAddr,
+        walletInfo: mockedWallet,
+        tokenUtxos: burnMocks.tokenUtxo
+      }
+
+      const hex = await burnTokens.burnTokens(burnConfig)
 
       // console.log(`hex: ${hex}`)
 

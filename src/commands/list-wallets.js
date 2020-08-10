@@ -21,6 +21,7 @@ class ListWallets extends Command {
     // const { flags } = this.parse(ListWallets)
 
     const walletData = this.parseWallets()
+    // console.log(`walletData: ${JSON.stringify(walletData, null, 2)}`)
 
     this.displayTable(walletData)
   }
