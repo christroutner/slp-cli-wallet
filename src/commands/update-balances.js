@@ -61,7 +61,9 @@ class UpdateBalances extends Command {
   validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === '') { throw new Error('You must specify a wallet with the -n flag.') }
+    if (!name || name === '') {
+      throw new Error('You must specify a wallet with the -n flag.')
+    }
 
     return true
   }
@@ -78,7 +80,9 @@ class UpdateBalances extends Command {
     console.log(`Existing balance: ${walletInfo.balance} BCH`)
 
     // Determine if this is a testnet wallet or a mainnet wallet.
-    if (walletInfo.network === 'testnet') { this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST }) }
+    if (walletInfo.network === 'testnet') {
+      this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+    }
 
     console.log(`debug: walletInfo.nextAddress = ${walletInfo.nextAddress}`)
 
@@ -181,7 +185,9 @@ class UpdateBalances extends Command {
       let batchHasBalance = true // Flag to signal when last address found.
 
       // Determine if this is a testnet wallet or a mainnet wallet.
-      if (walletInfo.network === 'testnet') { this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST }) }
+      if (walletInfo.network === 'testnet') {
+        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+      }
 
       while (batchHasBalance || currentIndex < walletInfo.nextAddress) {
         // while (batchHasBalance || currentIndex < 60) {
@@ -193,6 +199,13 @@ class UpdateBalances extends Command {
           ignoreTokens
         )
         // console.log(`thisDataBatch: ${util.inspect(thisDataBatch)}`)
+        // console.log(
+        //   `thisDataBatch.slpUtxos: ${JSON.stringify(
+        //     thisDataBatch.slpUtxos,
+        //     null,
+        //     2
+        //   )}`
+        // )
 
         // Increment the index by 20 (addresses).
         currentIndex += 20
@@ -265,7 +278,9 @@ class UpdateBalances extends Command {
         if (
           Number(thisAddr.balance) > 0 ||
           Number(thisAddr.unconfirmedBalance) > 0
-        ) { return true }
+        ) {
+          return true
+        }
       }
 
       // If the loop completes without finding a balance, return false.
@@ -284,7 +299,9 @@ class UpdateBalances extends Command {
     try {
       if (isNaN(index)) throw new Error('index must be supplied as a number.')
 
-      if (!limit || isNaN(limit)) { throw new Error('limit must be supplied as a non-zero number.') }
+      if (!limit || isNaN(limit)) {
+        throw new Error('limit must be supplied as a non-zero number.')
+      }
 
       if (limit > 20) throw new Error('limit must be 20 or less.')
 
@@ -330,21 +347,30 @@ class UpdateBalances extends Command {
   async getSlpUtxos (addresses) {
     try {
       // Validate input.
-      if (!Array.isArray(addresses)) { throw new Error('addresses must be an array') }
-      if (addresses.length > 20) { throw new Error('addresses array must be 20 or fewer elements.') }
+      if (!Array.isArray(addresses)) {
+        throw new Error('addresses must be an array')
+      }
+      if (addresses.length > 20) {
+        throw new Error('addresses array must be 20 or fewer elements.')
+      }
 
       // console.log(`BITBOX.apiToken: ${this.BITBOX.apiToken}`)
 
       // Check addresses to see if they contain any SLP tokens.
       // Pings SLPDB with an optimized query.
       // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
-      const slpBalances = await this.BITBOX.Util.balancesForAddress(addresses)
+      const slpBalances = await this.BITBOX.SLP.Utils.balancesForAddress(
+        addresses
+      )
       // console.log(`slpBalances: ${JSON.stringify(slpBalances, null, 2)}`)
 
       // Remove empty arrays (addresses that have no tokens).
       const consolidatedBalances = slpBalances.filter(x => {
         if (x.length > 0) return x
       })
+      // console.log(
+      //   `consolidatedBalances: ${JSON.stringify(consolidatedBalances, null, 2)}`
+      // )
 
       // Loop through each address that has SLP tokens.
       let slpUtxos = []
@@ -356,6 +382,9 @@ class UpdateBalances extends Command {
         let tokenUtxos = []
         try {
           tokenUtxos = await this.findSlpUtxos(thisAddress)
+
+          // Filter out any tokenUtxos that have 'isValid' set to false
+          tokenUtxos = tokenUtxos.filter(x => x.isValid !== false)
         } catch (err) {}
         // const tokenUtxos = [] // Empty array to force-ignore tokens.
         // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
@@ -395,7 +424,9 @@ class UpdateBalances extends Command {
 
       // Filter out just the UTXOs that belong to SLP tokens.
       const tokenUtxos = []
-      for (let i = 0; i < isTokenUtxo.length; i++) { if (isTokenUtxo[i]) tokenUtxos.push(utxos[i]) }
+      for (let i = 0; i < isTokenUtxo.length; i++) {
+        if (isTokenUtxo[i]) tokenUtxos.push(utxos[i])
+      }
 
       // Add address data to each UTXO.
       for (let i = 0; i < tokenUtxos.length; i++) {
@@ -430,7 +461,9 @@ class UpdateBalances extends Command {
         // If the addresses array does not have the current address, add it.
         const found = walletInfo.addresses.find(x => x[0] === hdIndex)
         // console.log(`found: ${JSON.stringify(found, null, 2)}`)
-        if (!found || found.length === 0) { walletInfo.addresses.push([hdIndex, thisAddr.address]) }
+        if (!found || found.length === 0) {
+          walletInfo.addresses.push([hdIndex, thisAddr.address])
+        }
 
         // If the address has a balance, add it to the hasBalance array.
         if (
@@ -499,7 +532,8 @@ class UpdateBalances extends Command {
   }
 }
 
-UpdateBalances.description = 'Poll the network and update the balances of the wallet.'
+UpdateBalances.description =
+  'Poll the network and update the balances of the wallet.'
 
 UpdateBalances.flags = {
   name: flags.string({ char: 'n', description: 'Name of wallet' }),

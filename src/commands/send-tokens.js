@@ -150,7 +150,9 @@ class SendTokens extends Command {
 
       // instance of transaction builder
       let transactionBuilder
-      if (walletInfo.network === 'testnet') { transactionBuilder = new this.BITBOX.TransactionBuilder('testnet') } else transactionBuilder = new this.BITBOX.TransactionBuilder()
+      if (walletInfo.network === 'testnet') {
+        transactionBuilder = new this.BITBOX.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.BITBOX.TransactionBuilder()
 
       // const satoshisToSend = Math.floor(bch * 100000000)
       // console.log(`Amount to send in satoshis: ${satoshisToSend}`)
@@ -162,7 +164,9 @@ class SendTokens extends Command {
       transactionBuilder.addInput(txid, vout)
 
       // add each token UTXO as an input.
-      for (let i = 0; i < tokenUtxos.length; i++) { transactionBuilder.addInput(tokenUtxos[i].txid, tokenUtxos[i].vout) }
+      for (let i = 0; i < tokenUtxos.length; i++) {
+        transactionBuilder.addInput(tokenUtxos[i].txid, tokenUtxos[i].vout)
+      }
 
       // get byte count to calculate fee. paying 1 sat
       // Note: This may not be totally accurate. Just guessing on the byteCount size.
@@ -178,7 +182,9 @@ class SendTokens extends Command {
 
       // amount to send back to the sending address. It's the original amount - 1 sat/byte for tx size
       const remainder = originalAmount - txFee - 546 * 2
-      if (remainder < 1) { throw new Error('Selected UTXO does not have enough satoshis') }
+      if (remainder < 1) {
+        throw new Error('Selected UTXO does not have enough satoshis')
+      }
       // console.log(`remainder: ${remainder}`)
 
       // Generate the OP_RETURN entry for an SLP SEND transaction.
@@ -190,11 +196,11 @@ class SendTokens extends Command {
       } = this.BITBOX.SLP.TokenType1.generateSendOpReturn(tokenUtxos, qty)
       // console.log(`script: ${JSON.stringify(script, null, 2)}`)
 
-      const data = BITBOX.Script.encode(script)
+      // const data = BITBOX.Script.encode(script)
       // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // Add OP_RETURN as first output.
-      transactionBuilder.addOutput(data, 0)
+      transactionBuilder.addOutput(script, 0)
 
       // Send dust transaction representing tokens being sent.
       transactionBuilder.addOutput(
@@ -278,7 +284,9 @@ class SendTokens extends Command {
   getTokenUtxos (tokenId, walletInfo) {
     try {
       const tokenUtxos = walletInfo.SLPUtxos.filter(x => x.tokenId === tokenId)
-      if (tokenUtxos.length === 0) { throw new Error('No tokens in the wallet matched the given token ID.') }
+      if (tokenUtxos.length === 0) {
+        throw new Error('No tokens in the wallet matched the given token ID.')
+      }
 
       // For debugging:
       // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
@@ -314,16 +322,24 @@ class SendTokens extends Command {
 
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === '') { throw new Error('You must specify a wallet with the -n flag.') }
+    if (!name || name === '') {
+      throw new Error('You must specify a wallet with the -n flag.')
+    }
 
     const qty = flags.qty
-    if (isNaN(Number(qty))) { throw new Error('You must specify a quantity of tokens with the -q flag.') }
+    if (isNaN(Number(qty))) {
+      throw new Error('You must specify a quantity of tokens with the -q flag.')
+    }
 
     const sendAddr = flags.sendAddr
-    if (!sendAddr || sendAddr === '') { throw new Error('You must specify a send-to address with the -a flag.') }
+    if (!sendAddr || sendAddr === '') {
+      throw new Error('You must specify a send-to address with the -a flag.')
+    }
 
     const tokenId = flags.tokenId
-    if (!tokenId || tokenId === '') { throw new Error('You must specifcy the SLP token ID') }
+    if (!tokenId || tokenId === '') {
+      throw new Error('You must specifcy the SLP token ID')
+    }
 
     // check Token Id should be hexademical chracters.
     const re = /^([A-Fa-f0-9]{2}){32,32}$/
