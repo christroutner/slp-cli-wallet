@@ -14,31 +14,25 @@ const BurnTokens = require('../../src/commands/burn-tokens')
 
 // Mock data
 const testwallet = require('../mocks/testwallet.json')
+const mainwallet = require('../mocks/mainwallet.json')
 const { bitboxMock } = require('../mocks/bitbox')
 // const utilMocks = require('../mocks/util')
 const burnMocks = require('../mocks/burn-mocks')
-
-// Inspect utility used for debugging.
-const util = require('util')
-util.inspect.defaultOptions = {
-  showHidden: true,
-  colors: true,
-  depth: 1
-}
+// const mockWalletFilename = `${__dirname}/../../wallets/test123.json`
 
 // Set default environment variables for unit tests.
 if (!process.env.TEST) process.env.TEST = 'unit'
 
 describe('#burn-tokens', () => {
   let BITBOX
-  let mockedWallet
+  // let mockedWallet
   let burnTokens
   let sandbox
 
   beforeEach(() => {
     // By default, use the mocking library instead of live calls.
     BITBOX = bitboxMock
-    mockedWallet = Object.assign({}, testwallet) // Clone the testwallet
+    // mockedWallet = Object.assign({}, testwallet) // Clone the testwallet
 
     sandbox = sinon.createSandbox()
 
@@ -209,7 +203,7 @@ describe('#burn-tokens', () => {
   })
 
   describe('#burnTokens', () => {
-    it('should generate tx hex to burn tokens', async () => {
+    it('should generate tx hex to burn tokens on mainnet', async () => {
       const sendToAddr =
         'bitcoincash:qp72leshv5h4uw8nj500ljwjqq6tqxgsguduwe9zz8'
 
@@ -218,7 +212,7 @@ describe('#burn-tokens', () => {
         qty: 1,
         tokenChangeAddress: sendToAddr,
         bchChangeAddress: sendToAddr,
-        walletInfo: mockedWallet,
+        walletInfo: mainwallet,
         tokenUtxos: burnMocks.tokenUtxo
       }
 
@@ -227,6 +221,221 @@ describe('#burn-tokens', () => {
       // console.log(`hex: ${hex}`)
 
       assert.isString(hex)
+    })
+
+    it('should generate tx hex to burn tokens on testnet', async () => {
+      const sendToAddr = 'bchtest:qpsqatupevgezquvwg29jm0es2m4996655vhxxa8ac'
+
+      const burnConfig = {
+        utxo: burnMocks.bchUtxo,
+        qty: 1,
+        tokenChangeAddress: sendToAddr,
+        bchChangeAddress: sendToAddr,
+        walletInfo: testwallet,
+        tokenUtxos: burnMocks.tokenUtxo
+      }
+
+      const hex = await burnTokens.burnTokens(burnConfig)
+
+      // console.log(`hex: ${hex}`)
+
+      assert.isString(hex)
+    })
+
+    it('should throw error if not enough funds', async () => {
+      try {
+        const sendToAddr =
+          'bitcoincash:qp72leshv5h4uw8nj500ljwjqq6tqxgsguduwe9zz8'
+
+        const burnConfig = {
+          utxo: burnMocks.bchUtxo,
+          qty: 1,
+          tokenChangeAddress: sendToAddr,
+          bchChangeAddress: sendToAddr,
+          walletInfo: mainwallet,
+          tokenUtxos: burnMocks.tokenUtxo
+        }
+        burnConfig.utxo.satoshis = 1000
+
+        await burnTokens.burnTokens(burnConfig)
+
+        assert.equal(true, false, 'Unexpected result')
+      } catch (err) {
+        // console.log(`err.message: ${err.message}`)
+        assert.include(err.message, 'Selected UTXO does not have enough satoshis')
+      }
+    })
+  })
+
+  describe('#prepBurnTokens', () => {
+    if (process.env.TEST === 'unit') {
+      it('should generate a burnConfig object for mainnet', async () => {
+        // Mock network calls if this is a unit test.
+
+        sandbox
+          .stub(burnTokens.updateBalances, 'updateBalances')
+          .resolves(mainwallet)
+        sandbox
+          .stub(burnTokens.sendTokens, 'getTokenUtxos')
+          .resolves(burnMocks.tokenUtxo)
+        sandbox
+          .stub(burnTokens.sendTokens, 'getBchUtxos')
+          .resolves(burnMocks.bchUtxo)
+        sandbox.stub(burnTokens.send, 'selectUTXO').resolves(burnMocks.bchUtxo)
+        sandbox
+          .stub(burnTokens.getAddress, 'getAddress')
+          .resolves('bchtest:qpsqatupevgezquvwg29jm0es2m4996655vhxxa8ac')
+
+        const flags = {
+          name: 'test123',
+          qty: 1,
+          tokenId: '1234'
+        }
+
+        const burnConfig = await burnTokens.prepBurnTokens(flags)
+        // console.log(`burnConfig: ${JSON.stringify(burnConfig, null, 2)}`)
+
+        assert.property(burnConfig, 'utxo')
+        assert.property(burnConfig, 'qty')
+        assert.property(burnConfig, 'tokenChangeAddress')
+        assert.property(burnConfig, 'bchChangeAddress')
+        assert.property(burnConfig, 'walletInfo')
+      })
+
+      it('should generate a burnConfig object for testnet', async () => {
+        // Mock network calls if this is a unit test.
+
+        sandbox
+          .stub(burnTokens.updateBalances, 'updateBalances')
+          .resolves(testwallet)
+        sandbox
+          .stub(burnTokens.sendTokens, 'getTokenUtxos')
+          .resolves(burnMocks.tokenUtxo)
+        sandbox
+          .stub(burnTokens.sendTokens, 'getBchUtxos')
+          .resolves(burnMocks.bchUtxo)
+        sandbox.stub(burnTokens.send, 'selectUTXO').resolves(burnMocks.bchUtxo)
+        sandbox
+          .stub(burnTokens.getAddress, 'getAddress')
+          .resolves('bchtest:qpsqatupevgezquvwg29jm0es2m4996655vhxxa8ac')
+
+        const flags = {
+          name: 'test123',
+          qty: 1,
+          tokenId: '1234'
+        }
+
+        const burnConfig = await burnTokens.prepBurnTokens(flags)
+        // console.log(`burnConfig: ${JSON.stringify(burnConfig, null, 2)}`)
+
+        assert.property(burnConfig, 'utxo')
+        assert.property(burnConfig, 'qty')
+        assert.property(burnConfig, 'tokenChangeAddress')
+        assert.property(burnConfig, 'bchChangeAddress')
+        assert.property(burnConfig, 'walletInfo')
+      })
+    }
+
+    it('should return false if no spendable utxo found', async () => {
+      sandbox
+        .stub(burnTokens.updateBalances, 'updateBalances')
+        .resolves(testwallet)
+      sandbox
+        .stub(burnTokens.sendTokens, 'getTokenUtxos')
+        .resolves(burnMocks.tokenUtxo)
+      sandbox
+        .stub(burnTokens.sendTokens, 'getBchUtxos')
+        .resolves(burnMocks.bchUtxo)
+      sandbox.stub(burnTokens.send, 'selectUTXO').resolves([])
+
+      const flags = {
+        name: 'test123',
+        qty: 1,
+        tokenId: '1234'
+      }
+
+      const burnConfig = await burnTokens.prepBurnTokens(flags)
+      // console.log(`burnConfig: ${JSON.stringify(burnConfig, null, 2)}`)
+
+      assert.equal(false, burnConfig)
+    })
+
+    it('should catch errors', async () => {
+      try {
+        sandbox
+          .stub(burnTokens.updateBalances, 'updateBalances')
+          .throws(new Error('test error'))
+
+        const flags = {
+          name: 'test123',
+          qty: 1,
+          tokenId: '1234'
+        }
+
+        await burnTokens.prepBurnTokens(flags)
+        // console.log(`burnConfig: ${JSON.stringify(burnConfig, null, 2)}`)
+
+        assert(true, false, 'Unexpected result')
+      } catch (err) {
+        // console.log('err: ', err)
+        assert.include(err.message, 'test error')
+      }
+    })
+  })
+
+  describe('#run', () => {
+    it('should run the run() function', async () => {
+      const flags = {
+        name: 'test123',
+        qty: 1,
+        tokenId:
+          '40cac7db1e6131e27e7f4170868c8d747d8a7f41132febd7a8bc092717c371f2'
+      }
+
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(burnTokens, 'parse').returns({ flags: flags })
+      sandbox
+        .stub(burnTokens, 'prepBurnTokens')
+        .resolves({ walletInfo: { network: 'mainnet' } })
+      sandbox.stub(burnTokens, 'burnTokens').resolves('abc123')
+      sandbox.stub(burnTokens.appUtils, 'broadcastTx').resolves('abc123')
+
+      await burnTokens.run(flags)
+    })
+
+    it('should catch errors', async () => {
+      try {
+        sandbox.stub(burnTokens, 'parse').throws(new Error('test error'))
+
+        const flags = {
+          name: 'test123',
+          qty: 1,
+          tokenId: '1234'
+        }
+
+        await burnTokens.run(flags)
+        // console.log(`burnConfig: ${JSON.stringify(burnConfig, null, 2)}`)
+
+        assert(true, false, 'Unexpected result')
+      } catch (err) {
+        // console.log('err: ', err)
+        assert.include(err.message, 'test error')
+      }
+    })
+
+    it('should exit if prepBurnTokens returns false', async () => {
+      const flags = {
+        name: 'test123',
+        qty: 1,
+        tokenId:
+          '40cac7db1e6131e27e7f4170868c8d747d8a7f41132febd7a8bc092717c371f2'
+      }
+
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(burnTokens, 'parse').returns({ flags: flags })
+      sandbox.stub(burnTokens, 'prepBurnTokens').resolves(false)
+
+      await burnTokens.run(flags)
     })
   })
 })
