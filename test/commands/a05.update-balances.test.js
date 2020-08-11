@@ -112,7 +112,7 @@ describe('#update-balances.js', () => {
           .resolves(updateBalancesMocks.mockTokenUtxo)
 
         sandbox
-          .stub(updateBalances.BITBOX.SLP.Utils, 'tokenUtxoDetails')
+          .stub(updateBalances.BITBOX.Util, 'tokenUtxoDetails')
           .resolves(updateBalancesMocks.mockTokenUtxoDetails)
       }
 
@@ -177,7 +177,7 @@ describe('#update-balances.js', () => {
       // Mock external calls if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(updateBalances.BITBOX.SLP.Utils, 'balancesForAddress')
+          .stub(updateBalances.BITBOX.Util, 'balancesForAddress')
           .resolves(updateBalancesMocks.mockBalancesForAddress)
 
         sandbox
