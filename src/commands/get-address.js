@@ -17,7 +17,7 @@ const appUtils = new AppUtils()
 const config = require('../../config')
 
 // Mainnet by default.
-const BITBOX = new config.BCHLIB({
+const bchjs = new config.BCHLIB({
   restURL: config.MAINNET_REST,
   apiToken: config.JWT
 })
@@ -30,7 +30,7 @@ class GetAddress extends Command {
   constructor (argv, config) {
     super(argv, config)
 
-    this.BITBOX = BITBOX
+    this.bchjs = bchjs
     this.appUtils = appUtils
   }
 
@@ -42,7 +42,7 @@ class GetAddress extends Command {
       this.validateFlags(flags)
 
       // Determine if this is a testnet wallet or a mainnet wallet.
-      if (flags.testnet) { this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST }) }
+      if (flags.testnet) { this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST }) }
 
       // Generate an absolute filename from the name.
       const filename = `${__dirname}/../../wallets/${flags.name}.json`
@@ -52,8 +52,8 @@ class GetAddress extends Command {
       // Display the address as a QR code.
       qrcode.generate(newAddress, { small: true })
 
-      const slpAddr = this.BITBOX.SLP.Address.toSLPAddress(newAddress)
-      const legacy = this.BITBOX.Address.toLegacyAddress(newAddress)
+      const slpAddr = this.bchjs.SLP.Address.toSLPAddress(newAddress)
+      const legacy = this.bchjs.Address.toLegacyAddress(newAddress)
 
       // Display the address to the user.
       this.log(`cash address: ${newAddress}`)
@@ -72,25 +72,25 @@ class GetAddress extends Command {
     // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
     // Point to the correct rest server.
-    if (walletInfo.network === 'testnet') { this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST }) } else this.BITBOX = new config.BCHLIB({ restURL: config.MAINNET_REST })
+    if (walletInfo.network === 'testnet') { this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST }) } else this.bchjs = new config.BCHLIB({ restURL: config.MAINNET_REST })
 
     // root seed buffer
     let rootSeed
-    if (config.RESTAPI === 'bitcoin.com') { rootSeed = this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic) } else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
+    if (config.RESTAPI === 'bitcoin.com') { rootSeed = this.bchjs.Mnemonic.toSeed(walletInfo.mnemonic) } else rootSeed = await this.bchjs.Mnemonic.toSeed(walletInfo.mnemonic)
 
     // master HDNode
     let masterHDNode
-    if (walletInfo.network === 'testnet') { masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, 'testnet') } else masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
+    if (walletInfo.network === 'testnet') { masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed, 'testnet') } else masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed)
 
     // HDNode of BIP44 account
-    const account = this.BITBOX.HDNode.derivePath(
+    const account = this.bchjs.HDNode.derivePath(
       masterHDNode,
       `m/44'/${walletInfo.derivation}'/0'`
     )
     // console.log(`account: ${util.inspect(account)}`)
 
     // derive an external change address HDNode
-    const change = this.BITBOX.HDNode.derivePath(
+    const change = this.bchjs.HDNode.derivePath(
       account,
       `0/${walletInfo.nextAddress}`
     )
@@ -112,11 +112,11 @@ class GetAddress extends Command {
     await this.appUtils.saveWallet(filename, walletInfo)
 
     // get the cash address
-    let newAddress = this.BITBOX.HDNode.toCashAddress(change)
+    let newAddress = this.bchjs.HDNode.toCashAddress(change)
 
     // Convert to simpleledger: address if flag is set.
     if (flags && flags.token) {
-      if (config.RESTAPI === 'bitcoin.com') { newAddress = this.BITBOX.Address.toSLPAddress(newAddress) } else newAddress = this.BITBOX.Address.toSLPAddress(newAddress)
+      if (config.RESTAPI === 'bitcoin.com') { newAddress = this.bchjs.SLP.Address.toSLPAddress(newAddress) } else newAddress = this.bchjs.SLP.Address.toSLPAddress(newAddress)
     }
 
     return newAddress
