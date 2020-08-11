@@ -27,7 +27,7 @@ describe('Sweep', () => {
     // mockedWallet = Object.assign({}, testwallet) // Clone the testwallet
 
     sweep = new Sweep()
-    // sweep.BITBOX = BITBOX
+    // sweep.bchjs = bchjs
 
     sandbox = sinon.createSandbox()
   })
@@ -102,7 +102,7 @@ describe('Sweep', () => {
 
   describe('#getBalance()', () => {
     it('should return balance', async () => {
-      sweep.BITBOX = new config.BCHLIB({ restURL: config.MAINNET_REST })
+      sweep.bchjs = new config.BCHLIB({ restURL: config.MAINNET_REST })
 
       const flags = {
         wif: 'KzGSsGMuFgtwkTyT3T8jwS1yUNov2j79D4qoP3SnBDdiAJBKK9Te'
@@ -111,7 +111,7 @@ describe('Sweep', () => {
       // Use mocked data if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(sweep.BITBOX.Blockbook, 'balance')
+          .stub(sweep.bchjs.Blockbook, 'balance')
           .resolves(mockData.mockBalance1)
       }
 
@@ -126,7 +126,7 @@ describe('Sweep', () => {
     it('should return empty arrays if address has no UTXOs.', async () => {
       // Use mocked data if this is a unit test.
       if (process.env.TEST === 'unit') {
-        sandbox.stub(sweep.BITBOX.Blockbook, 'utxo').resolves([])
+        sandbox.stub(sweep.bchjs.Blockbook, 'utxo').resolves([])
       }
 
       const flags = {
@@ -146,11 +146,11 @@ describe('Sweep', () => {
         // Use mocked data if this is a unit test.
         if (process.env.TEST === 'unit') {
           sandbox
-            .stub(sweep.BITBOX.Blockbook, 'utxo')
+            .stub(sweep.bchjs.Blockbook, 'utxo')
             .resolves(mockData.tokenOnlyUtxos)
 
           sandbox
-            .stub(sweep.BITBOX.Util, 'tokenUtxoDetails')
+            .stub(sweep.bchjs.SLP.Utils, 'tokenUtxoDetails')
             .resolves(mockData.tokenOnlyTokenInfo)
         }
 
@@ -169,11 +169,11 @@ describe('Sweep', () => {
       // Use mocked data if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(sweep.BITBOX.Blockbook, 'utxo')
+          .stub(sweep.bchjs.Blockbook, 'utxo')
           .resolves(mockData.bchOnlyUtxos)
 
         sandbox
-          .stub(sweep.BITBOX.Util, 'tokenUtxoDetails')
+          .stub(sweep.bchjs.SLP.Utils, 'tokenUtxoDetails')
           .resolves(mockData.bchOnlyTokenInfo)
       }
 
@@ -193,11 +193,11 @@ describe('Sweep', () => {
       // Use mocked data if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(sweep.BITBOX.Blockbook, 'utxo')
+          .stub(sweep.bchjs.Blockbook, 'utxo')
           .resolves(mockData.bothUtxos)
 
         sandbox
-          .stub(sweep.BITBOX.Util, 'tokenUtxoDetails')
+          .stub(sweep.bchjs.SLP.Utils, 'tokenUtxoDetails')
           .resolves(mockData.bothTokenInfo)
       }
 
@@ -218,7 +218,7 @@ describe('Sweep', () => {
     it('should throw an error if there are no funds found', async () => {
       // Use mocked data if this is a unit test.
       if (process.env.TEST === 'unit') {
-        sandbox.stub(sweep.BITBOX.Blockbook, 'utxo').resolves([])
+        sandbox.stub(sweep.bchjs.Blockbook, 'utxo').resolves([])
       }
 
       const flags = {
@@ -242,7 +242,7 @@ describe('Sweep', () => {
       // Use mocked data if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(sweep.BITBOX.Blockbook, 'utxo')
+          .stub(sweep.bchjs.Blockbook, 'utxo')
           .resolves(mockData.bchOnlyUtxos)
       }
 
