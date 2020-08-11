@@ -216,14 +216,16 @@ class BurnTokens extends Command {
       // console.log(`remainder: ${remainder}`)
 
       // Generate the OP_RETURN entry for an SLP SEND transaction.
-      const script = this.generateOpReturn(tokenUtxos, qty)
+      // const script = this.generateOpReturn(tokenUtxos, qty)
       // console.log(`script: ${JSON.stringify(script, null, 2)}`)
 
-      const data = bchjs.Script.encode(script)
+      const script = this.bchjs.SLP.TokenType1.generateBurnOpReturn(tokenUtxos, qty)
+
+      // const data = bchjs.Script.encode(script)
       // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // Add OP_RETURN as first output.
-      transactionBuilder.addOutput(data, 0)
+      transactionBuilder.addOutput(script, 0)
 
       // Send dust transaction representing tokens being sent.
       transactionBuilder.addOutput(

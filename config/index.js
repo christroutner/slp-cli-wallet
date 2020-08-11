@@ -15,7 +15,9 @@
 let RESTAPI = 'fullstack.cash'
 
 // Override the RESTAPI setting if envronment variable is set.
-if (process.env.RESTAPI && process.env.RESTAPI !== '') { RESTAPI = process.env.RESTAPI }
+if (process.env.RESTAPI && process.env.RESTAPI !== '') {
+  RESTAPI = process.env.RESTAPI
+}
 
 // console.log(`process.env.RESTAPI: ${process.env.RESTAPI}`)
 
