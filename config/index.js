@@ -22,7 +22,7 @@ if (process.env.RESTAPI && process.env.RESTAPI !== '') { RESTAPI = process.env.R
 // Ensure bch-js can pick up the env var.
 process.env.RESTAPI = RESTAPI
 
-const BCHJS = require('@chris.troutner/bch-js')
+const BCHJS = require('@psf/bch-js')
 // const BITBOX = require("slp-sdk")
 
 const config = {}
