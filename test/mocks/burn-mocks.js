@@ -30,10 +30,10 @@ const tokenUtxo = [
 const bchUtxo = {
   txid: '0b7769cf3dd4b37ddc25987f6b6882caa22df8bd9aa92ab3f31b68a63acaee2e',
   vout: 0,
-  value: '20000',
+  value: '30000',
   height: 613965,
   confirmations: 81,
-  satoshis: 20000,
+  satoshis: 30000,
   hdIndex: 3,
   amount: 0.0002
 }

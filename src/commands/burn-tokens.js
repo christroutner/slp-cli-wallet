@@ -11,25 +11,20 @@
 
 'use strict'
 
-const GetAddress = require('./get-address')
-const UpdateBalances = require('./update-balances')
-const Send = require('./send')
-// const SendAll = require("./send-all")
-const SendTokens = require('./send-tokens')
-const config = require('../../config')
-
 const BigNumber = require('bignumber.js')
 
+const config = require('../../config')
+const GetAddress = require('./get-address')
+const UpdateBalances = require('./update-balances')
 const AppUtils = require('../util')
-const appUtils = new AppUtils()
+const Send = require('./send')
+const SendTokens = require('./send-tokens')
 
-const send = new Send()
-const sendTokens = new SendTokens()
 // const sendAll = new SendAll()
-const getAddress = new GetAddress()
+// const getAddress = new GetAddress()
 
 // Mainnet by default
-const BITBOX = new config.BCHLIB({
+const bchjs = new config.BCHLIB({
   restURL: config.MAINNET_REST,
   apiToken: config.JWT
 })
@@ -45,8 +40,23 @@ class BurnTokens extends Command {
     super(argv, config)
     // _this = this
 
-    this.BITBOX = BITBOX
-    this.appUtils = appUtils // Allows for easy mocking for unit tests.
+    this.bchjs = bchjs
+
+    // Encapsulate local libraries for each mocking for unit tests.
+    this.appUtils = new AppUtils()
+    this.appUtils.bchjs = this.bchjs
+
+    this.updateBalances = new UpdateBalances()
+    this.updateBalances.bchjs = this.bchjs
+
+    this.send = new Send()
+    this.send.bchjs = this.bchjs
+
+    this.sendTokens = new SendTokens()
+    this.sendTokens.bchjs = this.bchjs
+
+    this.getAddress = new GetAddress()
+    this.getAddress.bchjs = this.bchjs
   }
 
   async run () {
@@ -56,106 +66,121 @@ class BurnTokens extends Command {
       // Ensure flags meet qualifiying critieria.
       this.validateFlags(flags)
 
+      const burnConfig = await this.prepBurnTokens(flags)
+      if (!burnConfig) return
+
+      // Send the token, transfer change to the new address
+      const hex = await this.burnTokens(burnConfig)
+      // console.log(`hex: ${hex}`)
+
+      const txid = await this.appUtils.broadcastTx(hex)
+      this.appUtils.displayTxid(txid, burnConfig.walletInfo.network)
+    } catch (err) {
+      // if (err.message) console.log(err.message)
+      // else console.log(`Error in .run: `, err)
+      console.log('Error in burn-tokens.js/run(): ', err.message)
+    }
+  }
+
+  // Prepare to send a burn-token transaction. Returns a configuration object
+  // to feed into the burnTokens() method.
+  async prepBurnTokens (flags) {
+    try {
       const name = flags.name // Name of the wallet.
       const qty = flags.qty // Amount to send in BCH.
       const tokenId = flags.tokenId // SLP token ID.
 
       // Open the wallet data file.
       const filename = `${__dirname}/../../wallets/${name}.json`
-      let walletInfo = appUtils.openWallet(filename)
+      let walletInfo = this.appUtils.openWallet(filename)
       walletInfo.name = name
 
       // Determine if this is a testnet wallet or a mainnet wallet.
       if (walletInfo.network === 'testnet') {
-        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
-        appUtils.BITBOX = this.BITBOX
+        this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
+        // this.appUtils.bchjs = this.bchjs
       }
 
       // Update balances before sending.
-      const updateBalances = new UpdateBalances()
-      updateBalances.BITBOX = this.BITBOX
-      walletInfo = await updateBalances.updateBalances(flags)
+      walletInfo = await this.updateBalances.updateBalances(flags)
       // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
       // Get a list of token UTXOs from the wallet for this token.
-      const tokenUtxos = sendTokens.getTokenUtxos(tokenId, walletInfo)
+      const tokenUtxos = this.sendTokens.getTokenUtxos(tokenId, walletInfo)
+      // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
 
       // Get a list of BCH UTXOs in this wallet that can be used to pay for
       // the transaction fee.
-      const utxos = await sendTokens.getBchUtxos(walletInfo)
-      // console.log(`send utxos: ${util.inspect(utxos)}`)
+      const utxos = await this.sendTokens.getBchUtxos(walletInfo)
+      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Instatiate the Send class so this function can reuse its selectUTXO() code.
       if (walletInfo.network === 'testnet') {
-        send.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
-        send.appUtils.BITBOX = new config.BCHLIB({
-          restURL: config.TESTNET_REST
-        })
+        this.send.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
+        // this.send.appUtils.bchjs = new config.BCHLIB({
+        //   restURL: config.TESTNET_REST
+        // })
       }
 
       // Select optimal UTXO
       // TODO: Figure out the appropriate amount of BCH to use in selectUTXO()
-      const utxo = await send.selectUTXO(0.000015, utxos)
+      const utxo = await this.send.selectUTXO(0.000015, utxos)
       // 1500 satoshis used until a more accurate calculation can be devised.
-      // console.log(`selected utxo: ${util.inspect(utxo)}`)
+      // console.log(`selected utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       // Exit if there is no UTXO big enough to fulfill the transaction.
       if (!utxo.amount) {
         this.log(
           'Could not find a UTXO big enough for this transaction. More BCH needed.'
         )
-        return
+        return false
       }
 
       // Generate a new address, for sending change to.
-      getAddress.BITBOX = this.BITBOX
-      const tokenChangeAddress = await getAddress.getAddress(filename)
+      // getAddress.bchjs = this.bchjs
+      const tokenChangeAddress = await this.getAddress.getAddress(filename)
       // console.log(`tokenChangeAddress: ${tokenChangeAddress}`)
 
-      const bchChangeAddress = await getAddress.getAddress(filename)
+      const bchChangeAddress = await this.getAddress.getAddress(filename)
       // console.log(`bchChangeAddress: ${bchChangeAddress}`)
 
-      // Generate an address to send the qty of tokens to burn.
-      // const burnAddress = await getAddress.getAddress(filename)
-      // console.log(`burnAddress: ${burnAddress}`)
-
-      // Send the token, transfer change to the new address
-      const hex = await this.burnTokens(
+      // Return a config object.
+      return {
         utxo,
         qty,
         tokenChangeAddress,
         bchChangeAddress,
         walletInfo,
         tokenUtxos
-      )
-      // console.log(`hex: ${hex}`)
-
-      const txid = await appUtils.broadcastTx(hex)
-      appUtils.displayTxid(txid, walletInfo.network)
+      }
     } catch (err) {
-      // if (err.message) console.log(err.message)
-      // else console.log(`Error in .run: `, err)
-      console.log('Error in burn-tokens.js/run(): ', err)
+      console.error('Error in startBurnTokens()')
+      throw err
     }
   }
 
   // Spends tokens and burns the selected quantity by subtracting that amount
   // from the output. This function returns a hex string of a transaction, ready
   // to be broadcast to the network.
-  async burnTokens (
-    utxo,
-    qty,
-    tokenChangeAddress,
-    bchChangeAddress,
-    walletInfo,
-    tokenUtxos
-  ) {
+  async burnTokens (burnConfig) {
     try {
       // console.log(`utxo: ${util.inspect(utxo)}`)
 
+      // Expand the config object into separate objects.
+      const {
+        utxo,
+        qty,
+        tokenChangeAddress,
+        bchChangeAddress,
+        walletInfo,
+        tokenUtxos
+      } = burnConfig
+
       // instance of transaction builder
       let transactionBuilder
-      if (walletInfo.network === 'testnet') { transactionBuilder = new this.BITBOX.TransactionBuilder('testnet') } else transactionBuilder = new this.BITBOX.TransactionBuilder()
+      if (walletInfo.network === 'testnet') {
+        transactionBuilder = new this.bchjs.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.bchjs.TransactionBuilder()
 
       // const satoshisToSend = Math.floor(bch * 100000000)
       // console.log(`Amount to send in satoshis: ${satoshisToSend}`)
@@ -167,11 +192,13 @@ class BurnTokens extends Command {
       transactionBuilder.addInput(txid, vout)
 
       // add each token UTXO as an input.
-      for (let i = 0; i < tokenUtxos.length; i++) { transactionBuilder.addInput(tokenUtxos[i].txid, tokenUtxos[i].vout) }
+      for (let i = 0; i < tokenUtxos.length; i++) {
+        transactionBuilder.addInput(tokenUtxos[i].txid, tokenUtxos[i].vout)
+      }
 
       // get byte count to calculate fee. paying 1 sat
       // Note: This may not be totally accurate. Just guessing on the byteCount size.
-      // const byteCount = this.BITBOX.BitcoinCash.getByteCount(
+      // const byteCount = this.bchjs.BitcoinCash.getByteCount(
       //   { P2PKH: 3 },
       //   { P2PKH: 5 }
       // )
@@ -183,14 +210,16 @@ class BurnTokens extends Command {
 
       // amount to send back to the sending address. It's the original amount - 1 sat/byte for tx size
       const remainder = originalAmount - txFee - 546 * 2
-      if (remainder < 1) { throw new Error('Selected UTXO does not have enough satoshis') }
+      if (remainder < 1) {
+        throw new Error('Selected UTXO does not have enough satoshis')
+      }
       // console.log(`remainder: ${remainder}`)
 
       // Generate the OP_RETURN entry for an SLP SEND transaction.
       const script = this.generateOpReturn(tokenUtxos, qty)
       // console.log(`script: ${JSON.stringify(script, null, 2)}`)
 
-      const data = BITBOX.Script.encode(script)
+      const data = bchjs.Script.encode(script)
       // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // Add OP_RETURN as first output.
@@ -198,24 +227,24 @@ class BurnTokens extends Command {
 
       // Send dust transaction representing tokens being sent.
       transactionBuilder.addOutput(
-        this.BITBOX.Address.toLegacyAddress(tokenChangeAddress),
+        this.bchjs.Address.toLegacyAddress(tokenChangeAddress),
         546
       )
 
       // Last output: send the change back to the wallet.
       transactionBuilder.addOutput(
-        this.BITBOX.Address.toLegacyAddress(bchChangeAddress),
+        this.bchjs.Address.toLegacyAddress(bchChangeAddress),
         remainder
       )
       // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       // Generate a keypair from the change address.
-      const change = await appUtils.changeAddrFromMnemonic(
+      const change = await this.appUtils.changeAddrFromMnemonic(
         walletInfo,
         utxo.hdIndex
       )
       // console.log(`change: ${JSON.stringify(change, null, 2)}`)
-      const keyPair = this.BITBOX.HDNode.toKeyPair(change)
+      const keyPair = this.bchjs.HDNode.toKeyPair(change)
 
       // Sign the transaction with the private key for the UTXO paying the fees.
       let redeemScript
@@ -233,12 +262,12 @@ class BurnTokens extends Command {
         // console.log(`thisUtxo: ${JSON.stringify(thisUtxo, null, 2)}`)
 
         // Generate a keypair to sign the SLP UTXO.
-        const slpChangeAddr = await appUtils.changeAddrFromMnemonic(
+        const slpChangeAddr = await this.appUtils.changeAddrFromMnemonic(
           walletInfo,
           thisUtxo.hdIndex
         )
 
-        const slpKeyPair = this.BITBOX.HDNode.toKeyPair(slpChangeAddr)
+        const slpKeyPair = this.bchjs.HDNode.toKeyPair(slpChangeAddr)
         // console.log(`slpKeyPair: ${JSON.stringify(slpKeyPair, null, 2)}`)
 
         transactionBuilder.sign(
@@ -260,7 +289,7 @@ class BurnTokens extends Command {
 
       return hex
     } catch (err) {
-      console.log('Error in sendTokens()')
+      console.log('Error in burnTokens()')
       throw err
     }
   }
@@ -274,16 +303,22 @@ class BurnTokens extends Command {
       // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
       // console.log(`qty: ${qty}`)
 
-      if (!tokenUtxos || tokenUtxos.length === 0) { throw new Error('tokenUtxos array can not be empty.') }
+      if (!tokenUtxos || tokenUtxos.length === 0) {
+        throw new Error('tokenUtxos array can not be empty.')
+      }
 
-      if (!qty || qty <= 0) { throw new Error('Quantity to burn needs to be greater than zero.') }
+      if (!qty || qty <= 0) {
+        throw new Error('Quantity to burn needs to be greater than zero.')
+      }
 
       const tokenId = tokenUtxos[0].tokenId
       const decimals = tokenUtxos[0].decimals
 
       // Calculate the total amount of tokens owned by the wallet.
       let totalTokens = 0
-      for (let i = 0; i < tokenUtxos.length; i++) { totalTokens += tokenUtxos[i].tokenQty }
+      for (let i = 0; i < tokenUtxos.length; i++) {
+        totalTokens += tokenUtxos[i].tokenQty
+      }
 
       // Calculate the amount of send, which is the total minus the quantity to
       // burn.
@@ -297,9 +332,9 @@ class BurnTokens extends Command {
       // console.log(`baseQty: ${baseQty.toString()}`)
 
       const script = [
-        BITBOX.Script.opcodes.OP_RETURN,
+        bchjs.Script.opcodes.OP_RETURN,
         Buffer.from('534c5000', 'hex'),
-        // BITBOX.Script.opcodes.OP_1,
+        // bchjs.Script.opcodes.OP_1,
         Buffer.from('01', 'hex'),
         Buffer.from('SEND'),
         Buffer.from(tokenId, 'hex'),
@@ -319,13 +354,19 @@ class BurnTokens extends Command {
 
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === '') { throw new Error('You must specify a wallet with the -n flag.') }
+    if (!name || name === '') {
+      throw new Error('You must specify a wallet with the -n flag.')
+    }
 
     const qty = flags.qty
-    if (isNaN(Number(qty))) { throw new Error('You must specify a quantity of tokens with the -q flag.') }
+    if (isNaN(Number(qty))) {
+      throw new Error('You must specify a quantity of tokens with the -q flag.')
+    }
 
     const tokenId = flags.tokenId
-    if (!tokenId || tokenId === '') { throw new Error('You must specifcy the SLP token ID') }
+    if (!tokenId || tokenId === '') {
+      throw new Error('You must specifcy the SLP token ID')
+    }
 
     // check Token Id should be hexademical chracters.
     const re = /^([A-Fa-f0-9]{2}){32,32}$/
