@@ -43,7 +43,7 @@ if (RESTAPI === 'wallet') {
 }
 
 if (RESTAPI === 'fullstack.cash') {
-  config.BCHLIB = BCHJS
+  config.BCHLIB = BCHJS.BitboxShim()
   config.MAINNET_REST = 'https://api.fullstack.cash/v3/'
   config.TESTNET_REST = 'https://tapi.fullstack.cash/v3/'
   config.RESTAPI = 'bchjs'

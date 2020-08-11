@@ -410,7 +410,7 @@ class UpdateBalances extends Command {
       // console.log(`slpAddr: ${slpAddr}`)
 
       // Convert the slpAddr to a cashAddr.
-      const cashAddr = this.BITBOX.SLP.Address.toCashAddress(slpAddr)
+      const cashAddr = this.BITBOX.Address.toCashAddress(slpAddr)
       // console.log(`cashAddr: ${cashAddr}`)
 
       // Get utxos associated with this address.
@@ -419,7 +419,7 @@ class UpdateBalances extends Command {
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Figure out which UTXOs are associated with SLP tokens.
-      const isTokenUtxo = await this.BITBOX.SLP.Utils.tokenUtxoDetails(utxos)
+      const isTokenUtxo = await this.BITBOX.Util.tokenUtxoDetails(utxos)
       // console.log(`isTokenUtxo: ${JSON.stringify(isTokenUtxo, null, 2)}`)
 
       // Filter out just the UTXOs that belong to SLP tokens.
