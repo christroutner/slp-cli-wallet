@@ -11,8 +11,6 @@
 
 'use strict'
 
-const BigNumber = require('bignumber.js')
-
 const config = require('../../config')
 const GetAddress = require('./get-address')
 const UpdateBalances = require('./update-balances')
@@ -215,14 +213,10 @@ class BurnTokens extends Command {
       }
       // console.log(`remainder: ${remainder}`)
 
-      // Generate the OP_RETURN entry for an SLP SEND transaction.
-      // const script = this.generateOpReturn(tokenUtxos, qty)
-      // console.log(`script: ${JSON.stringify(script, null, 2)}`)
-
-      const script = this.bchjs.SLP.TokenType1.generateBurnOpReturn(tokenUtxos, qty)
-
-      // const data = bchjs.Script.encode(script)
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      const script = this.bchjs.SLP.TokenType1.generateBurnOpReturn(
+        tokenUtxos,
+        qty
+      )
 
       // Add OP_RETURN as first output.
       transactionBuilder.addOutput(script, 0)
@@ -292,60 +286,6 @@ class BurnTokens extends Command {
       return hex
     } catch (err) {
       console.log('Error in burnTokens()')
-      throw err
-    }
-  }
-
-  // Generate the OP_RETURN script for an SLP Send transaction.
-  // It's assumed all elements in the tokenUtxos array belong to the same token.
-  // Differs from the similar function in the send-token command, in that it
-  // does not send change. It sends all tokens, minus the amount to be burned.
-  generateOpReturn (tokenUtxos, qty) {
-    try {
-      // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
-      // console.log(`qty: ${qty}`)
-
-      if (!tokenUtxos || tokenUtxos.length === 0) {
-        throw new Error('tokenUtxos array can not be empty.')
-      }
-
-      if (!qty || qty <= 0) {
-        throw new Error('Quantity to burn needs to be greater than zero.')
-      }
-
-      const tokenId = tokenUtxos[0].tokenId
-      const decimals = tokenUtxos[0].decimals
-
-      // Calculate the total amount of tokens owned by the wallet.
-      let totalTokens = 0
-      for (let i = 0; i < tokenUtxos.length; i++) {
-        totalTokens += tokenUtxos[i].tokenQty
-      }
-
-      // Calculate the amount of send, which is the total minus the quantity to
-      // burn.
-      const sendQty = totalTokens - qty
-
-      let baseQty = new BigNumber(sendQty).times(10 ** decimals)
-      baseQty = baseQty.absoluteValue()
-      let baseQtyHex = baseQty.toString(16)
-      baseQtyHex = baseQtyHex.padStart(16, '0')
-
-      // console.log(`baseQty: ${baseQty.toString()}`)
-
-      const script = [
-        bchjs.Script.opcodes.OP_RETURN,
-        Buffer.from('534c5000', 'hex'),
-        // bchjs.Script.opcodes.OP_1,
-        Buffer.from('01', 'hex'),
-        Buffer.from('SEND'),
-        Buffer.from(tokenId, 'hex'),
-        Buffer.from(baseQtyHex, 'hex')
-      ]
-
-      return script
-    } catch (err) {
-      console.log('Error in generateOpReturn()')
       throw err
     }
   }
