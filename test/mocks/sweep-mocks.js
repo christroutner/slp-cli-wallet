@@ -88,23 +88,33 @@ const bothUtxos = [
 
 const bothTokenInfo = [
   {
-    txid: 'b319024ef23f49ec645e7b5d92db66269553d662d0ad63fbf0db1d0a276c7974',
+    txid: 'cfef85eadec3f6c0f62e522d8e7b9e5e664f27b29442b882c8aa021fb02b5e45',
     vout: 1,
     value: '546',
-    height: 603753,
-    confirmations: 117,
+    height: 648506,
+    confirmations: 1,
     satoshis: 546,
     utxoType: 'token',
     transactionType: 'send',
-    tokenId: 'dd84ca78db4d617221b58eabc6667af8fe2f7eadbfcc213d35be9f1b419beb8d',
-    tokenTicker: 'TAP',
-    tokenName: 'Thoughts and Prayers',
-    tokenDocumentUrl: '',
+    tokenId: 'a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2',
+    tokenTicker: 'TROUT',
+    tokenName: "Trout's test token",
+    tokenDocumentUrl: 'troutsblog.com',
     tokenDocumentHash: '',
-    decimals: 0,
-    tokenQty: 1
+    decimals: 2,
+    tokenType: 1,
+    tokenQty: 2.3,
+    isValid: true
   },
-  false
+  {
+    txid: '056aec5d36110ab2701f068e88b35cbb1dd1f8c2964aa72f5475d56231bd1aa6',
+    vout: 0,
+    value: '10000',
+    height: 648506,
+    confirmations: 1,
+    satoshis: 10000,
+    isValid: false
+  }
 ]
 
 const bchUtxo = [

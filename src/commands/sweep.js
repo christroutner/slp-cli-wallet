@@ -379,9 +379,9 @@ class Sweep extends Command {
       // console.log(`isTokenUtxo: ${JSON.stringify(isTokenUtxo, null, 2)}`)
 
       // Separate the bch and token UTXOs.
-      for (let i = 0; i < utxos.length; i++) {
+      for (let i = 0; i < isTokenUtxo.length; i++) {
         // Filter based on isTokenUtxo.
-        if (!isTokenUtxo[i]) bchUtxos.push(utxos[i])
+        if (!isTokenUtxo[i].isValid) bchUtxos.push(isTokenUtxo[i])
         else tokenUtxos.push(isTokenUtxo[i])
       }
 
