@@ -485,7 +485,7 @@ class UpdateBalances extends Command {
       if (walletInfo.addresses === undefined) walletInfo.addresses = []
 
       // Loop through each HD address index
-      for (var i = 0; i < addressData.length; i++) {
+      for (var i = 0; i < walletInfo.nextAddress; i++) {
         const thisAddr = addressData[i]
 
         const hdIndex = thisAddr.hdIndex
