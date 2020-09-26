@@ -1,11 +1,5 @@
 /*
-  Forked from get-address.js. This command generates a private key and public
-  address. Both are displayed on the command line along with a QR code.
-  This is exactly the same thing as generating a 'paper wallet'.
-  The QR code for private key can be 'swept' with the bitcoin.com wallet.
-
-  -The next available address is tracked by the 'nextAddress' property in the
-  wallet .json file.
+  Cryptographically sign a message with a specific address of the wallet.
 */
 
 'use strict'
@@ -140,7 +134,7 @@ SignMessage.description = 'Sign message'
 
 SignMessage.flags = {
   name: flags.string({ char: 'n', description: 'Name of wallet' }),
-  sendAddrIndex: flags.string({ char: 'i', description: 'Adress index' }),
+  sendAddrIndex: flags.string({ char: 'i', description: 'Address index' }),
   signTheMessage: flags.string({ char: 's', description: 'Sign message' })
 }
 
