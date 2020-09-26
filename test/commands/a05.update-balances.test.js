@@ -71,7 +71,7 @@ describe('#update-balances.js', () => {
   //     // })
   //
   //     const addr = await updateBalances.generateAddress(
-  //       updateBalancesMocks.mockWallet,
+  //       updateBalancesMocks.mockWallet1,
   //       3,
   //       1
   //     )
@@ -215,7 +215,7 @@ describe('#update-balances.js', () => {
   describe('#getAddressData', () => {
     it('should throw error if index is not supplied', async () => {
       try {
-        await updateBalances.getAddressData(updateBalancesMocks.mockWallet)
+        await updateBalances.getAddressData(updateBalancesMocks.mockWallet1)
 
         assert.equal(true, false, 'unexpected result!')
       } catch (err) {
@@ -226,7 +226,7 @@ describe('#update-balances.js', () => {
 
     it('should throw error if limit is not supplied', async () => {
       try {
-        await updateBalances.getAddressData(updateBalancesMocks.mockWallet, 0)
+        await updateBalances.getAddressData(updateBalancesMocks.mockWallet1, 0)
 
         assert.equal(true, false, 'unexpected result!')
       } catch (err) {
@@ -241,7 +241,7 @@ describe('#update-balances.js', () => {
     it('should throw error if limit is over 20', async () => {
       try {
         await updateBalances.getAddressData(
-          updateBalancesMocks.mockWallet,
+          updateBalancesMocks.mockWallet1,
           0,
           40
         )
@@ -253,34 +253,63 @@ describe('#update-balances.js', () => {
       }
     })
 
-    it('should return an array of address and SLP data', async () => {
-      // Ensure we're using testnet
-      updateBalances.bchjs = new config.BCHLIB({
-        restURL: config.TESTNET_REST
-      })
+    // it('should return an array of address and SLP data', async () => {
+    //   // Ensure we're using testnet
+    //   updateBalances.bchjs = new config.BCHLIB({
+    //     restURL: config.TESTNET_REST
+    //   })
+    //
+    //   // Mock external calls if this is a unit test.
+    //   if (process.env.TEST === 'unit') {
+    //     sandbox
+    //       .stub(updateBalances.bchjs.Blockbook, 'balance')
+    //       .resolves(updateBalancesMocks.mockAddressDetails1)
+    //
+    //     sandbox.stub(updateBalances, 'getSlpUtxos').resolves([])
+    //   }
+    //
+    //   const result = await updateBalances.getAddressData(
+    //     updateBalancesMocks.mockWallet,
+    //     0,
+    //     3
+    //   )
+    //   console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    //
+    //   assert.isArray(result.balances)
+    //   assert.isArray(result.slpUtxos)
+    //
+    //   // Ensure balances index the HD wallet index for the address.
+    //   assert.property(result.balances[0], 'hdIndex')
+    // })
 
-      // Mock external calls if this is a unit test.
-      if (process.env.TEST === 'unit') {
-        sandbox
-          .stub(updateBalances.bchjs.Blockbook, 'balance')
-          .resolves(updateBalancesMocks.mockAddressDetails1)
-
-        sandbox.stub(updateBalances, 'getSlpUtxos').resolves([])
-      }
-
-      const result = await updateBalances.getAddressData(
-        updateBalancesMocks.mockWallet,
-        0,
-        3
-      )
-      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
-
-      assert.isArray(result.balances)
-      assert.isArray(result.slpUtxos)
-
-      // Ensure balances index the HD wallet index for the address.
-      assert.property(result.balances[0], 'hdIndex')
-    })
+    // it('should return an data on 20 addresses', async () => {
+    //   // Ensure we're using testnet
+    //   updateBalances.bchjs = new config.BCHLIB({
+    //     restURL: config.TESTNET_REST
+    //   })
+    //
+    //   // Mock external calls if this is a unit test.
+    //   if (process.env.TEST === 'unit') {
+    //     sandbox
+    //       .stub(updateBalances.bchjs.Blockbook, 'balance')
+    //       .resolves(updateBalancesMocks.mockAddressDetails1)
+    //
+    //     sandbox.stub(updateBalances, 'getSlpUtxos').resolves([])
+    //   }
+    //
+    //   const result = await updateBalances.getAddressData(
+    //     updateBalancesMocks.mockWallet,
+    //     0,
+    //     3
+    //   )
+    //   // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    //
+    //   assert.isArray(result.balances)
+    //   assert.isArray(result.slpUtxos)
+    //
+    //   // Ensure balances index the HD wallet index for the address.
+    //   assert.property(result.balances[0], 'hdIndex')
+    // })
   })
 
   describe('#detectBalance', () => {
@@ -326,7 +355,7 @@ describe('#update-balances.js', () => {
       }
 
       const result = await updateBalances.getAllAddressData(
-        updateBalancesMocks.mockWallet
+        updateBalancesMocks.mockWallet1
       )
       // console.log(`result: ${util.inspect(result)}`)
 
@@ -339,7 +368,7 @@ describe('#update-balances.js', () => {
     it('generates a hasBalance array', async () => {
       const hasBalance = await updateBalances.generateHasBalance(
         updateBalancesMocks.mockAddressDetails1,
-        updateBalancesMocks.mockWallet
+        updateBalancesMocks.mockWallet1
       )
       // console.log(`hasBalance: ${util.inspect(hasBalance)}`)
 

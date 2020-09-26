@@ -70,6 +70,7 @@
     "test:integration": "RESTAPI=fullstack.cash TEST=integration nyc --reporter=text mocha  --timeout 25000",
     "test:integration:local": "RESTAPI=local TEST=integration nyc --reporter=text mocha  --timeout 25000",
     "test:integration:decatur": "RESTAPI=decatur TEST=integration nyc --reporter=text mocha  --timeout 25000",
+    "test:temp": "TEST=integration mocha --timeout 25000 -g '#getAddressData'",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coverage:report": "nyc --reporter=html mocha",
     "version": "oclif-dev readme && git add README.md",

@@ -149,7 +149,7 @@ const mockBalancesForAddress = [
   ]
 ]
 
-const mockWallet = {
+const mockWallet1 = {
   network: 'testnet',
   mnemonic:
     'alert mad wreck salon target later across crater stick mammal grunt ability',
@@ -375,7 +375,7 @@ module.exports = {
   mockTokenUtxo,
   mockTokenUtxoDetails,
   mockBalancesForAddress,
-  mockWallet,
+  mockWallet1,
   mockAddressData,
   mockSlpUtxoData
 }
