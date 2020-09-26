@@ -325,7 +325,8 @@ class UpdateBalances extends Command {
   // Retrieves details data (objects) on addresses in an HD wallet from REST server.
   // A max of 20 addresses can be retrieved at a time.
   // Addresses start at the index and the number of address data retrieved is
-  // set by the limit (up to 20). Data is returned as an array of objects.
+  // set by the limit (up to 20). Data is returned as an object with balance and
+  // hydrated utxo data.
   async getAddressData (walletInfo, index, limit, ignoreTokens) {
     try {
       if (isNaN(index)) throw new Error('index must be supplied as a number.')
