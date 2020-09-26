@@ -108,11 +108,11 @@ describe('#update-balances.js', () => {
       // Mock external calls if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(updateBalances.BITBOX.Blockbook, 'utxo')
+          .stub(updateBalances.bchjs.Blockbook, 'utxo')
           .resolves(updateBalancesMocks.mockTokenUtxo)
 
         sandbox
-          .stub(updateBalances.BITBOX.Util, 'tokenUtxoDetails')
+          .stub(updateBalances.bchjs.Util, 'tokenUtxoDetails')
           .resolves(updateBalancesMocks.mockTokenUtxoDetails)
       }
 
@@ -170,14 +170,14 @@ describe('#update-balances.js', () => {
     })
 
     it('should return information on any address with UTXO information', async () => {
-      updateBalances.BITBOX = new config.BCHLIB({
+      updateBalances.bchjs = new config.BCHLIB({
         restURL: config.MAINNET_REST
       })
 
       // Mock external calls if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(updateBalances.BITBOX.Util, 'balancesForAddress')
+          .stub(updateBalances.bchjs.Util, 'balancesForAddress')
           .resolves(updateBalancesMocks.mockBalancesForAddress)
 
         sandbox
@@ -255,14 +255,14 @@ describe('#update-balances.js', () => {
 
     it('should return an array of address and SLP data', async () => {
       // Ensure we're using testnet
-      updateBalances.BITBOX = new config.BCHLIB({
+      updateBalances.bchjs = new config.BCHLIB({
         restURL: config.TESTNET_REST
       })
 
       // Mock external calls if this is a unit test.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(updateBalances.BITBOX.Blockbook, 'balance')
+          .stub(updateBalances.bchjs.Blockbook, 'balance')
           .resolves(updateBalancesMocks.mockAddressDetails1)
 
         sandbox.stub(updateBalances, 'getSlpUtxos').resolves([])
