@@ -121,7 +121,7 @@ class UpdateBalances extends Command {
       walletInfo,
       flags.ignoreTokens
     )
-    console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
+    // console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
 
     // Update hasBalance array with non-zero balances.
     // const hasBalance = this.generateHasBalance(addressData.addressData)
@@ -137,17 +137,18 @@ class UpdateBalances extends Command {
     // Summarize token balances
     this.displayTokenBalances(addressData.slpUtxoData)
 
-    // // Save the data to the wallet JSON file.
-    // walletInfo.balance = this.appUtils.eightDecimals(
-    //   balance.totalConfirmed + balance.totalUnconfirmed
-    // )
-    // walletInfo.balanceConfirmed = balance.totalConfirmed
-    // walletInfo.balanceUnconfirmed = balance.totalUnconfirmed
-    // walletInfo.hasBalance = hasBalance
-    // walletInfo.SLPUtxos = addressData.slpUtxoData
-    // await this.appUtils.saveWallet(filename, walletInfo)
-    //
-    // return walletInfo
+    // Save the data to the wallet JSON file.
+    walletInfo.balance = this.appUtils.eightDecimals(
+      balance.totalConfirmed + balance.totalUnconfirmed
+    )
+    walletInfo.balanceConfirmed = balance.totalConfirmed
+    walletInfo.balanceUnconfirmed = balance.totalUnconfirmed
+    walletInfo.hasBalance = hasBalance
+    walletInfo.SLPUtxos = addressData.slpUtxoData
+    walletInfo.BCHUtxos = addressData.bchUtxoData
+    await this.appUtils.saveWallet(filename, walletInfo)
+
+    return walletInfo
   }
 
   // Display summary of token balances in the wallet.
@@ -583,19 +584,19 @@ class UpdateBalances extends Command {
 
         // If the address has a balance, add it to the hasBalance array.
         if (
-          Number(thisAddr.balance) > 0 ||
-          Number(thisAddr.unconfirmedBalance) > 0
+          Number(thisAddr.balance.confirmed) > 0 ||
+          Number(thisAddr.balance.unconfirmed) > 0
         ) {
           const thisObj = {
             index: hdIndex,
             balance: this.appUtils.eightDecimals(
-              Number(thisAddr.balance) / SATS_PER_BCH
+              Number(thisAddr.balance.confirmed) / SATS_PER_BCH
             ),
-            balanceSat: Number(thisAddr.balance),
+            balanceSat: Number(thisAddr.balance.confirmed),
             unconfirmedBalance: this.appUtils.eightDecimals(
-              Number(thisAddr.unconfirmedBalance) / SATS_PER_BCH
+              Number(thisAddr.balance.unconfirmed) / SATS_PER_BCH
             ),
-            unconfirmedBalanceSat: Number(thisAddr.unconfirmedBalance),
+            unconfirmedBalanceSat: Number(thisAddr.balance.unconfirmed),
             cashAddress: thisAddr.address
           }
 
