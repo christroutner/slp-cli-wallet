@@ -407,7 +407,7 @@ describe('#update-balances.js', () => {
         }
 
         const walletInfo = await updateBalances.updateBalances(flags)
-        // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
+        console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
         assert.hasAllKeys(walletInfo, [
           'network',

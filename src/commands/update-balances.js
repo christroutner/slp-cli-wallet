@@ -241,6 +241,14 @@ class UpdateBalances extends Command {
         // Increment the index by 20 (addresses).
         currentIndex += 20
 
+        console.log(
+          `thisDataBatch.balances: ${JSON.stringify(
+            thisDataBatch.balances,
+            null,
+            2
+          )}`
+        )
+
         // Check if data has no balance. no balance == last address.
         batchHasBalance = this.detectBalance(thisDataBatch.balances)
         // console.log(`batchHasBalance: ${batchHasBalance}`)

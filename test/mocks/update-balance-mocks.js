@@ -7,57 +7,48 @@
 // Has an address with a balance.
 const mockAddressDetails1 = [
   {
-    page: 1,
-    totalPages: 1,
-    itemsOnPage: 1000,
-    address: 'bchtest:qzl37uzel5urphw8dnkerxtlr5mxunvsys062p7g9v',
-    balance: '0',
-    totalReceived: '0',
-    totalSent: '0',
-    unconfirmedBalance: '0',
-    unconfirmedTxs: 0,
-    txs: 0
+    balance: {
+      confirmed: 0,
+      unconfirmed: 0
+    },
+    address: 'bitcoincash:qrj5p3j59zg2cqt3pe09vgk6w627y7nnzy3c9ffqg3',
+    hdIndex: 0
   },
   {
-    page: 1,
-    totalPages: 1,
-    itemsOnPage: 1000,
-    address: 'bchtest:qp6dyeslwkslzruaf29vvtv6lg7lez8csca90lg6a0',
-    balance: '1000',
-    totalReceived: '1000',
-    totalSent: '0',
-    unconfirmedBalance: '0',
-    unconfirmedTxs: 0,
-    txs: 1,
-    txids: ['2cb218dc02e5df66506950174bfa540497973cba141f1ff737d3be042069c935']
+    balance: {
+      confirmed: 6000,
+      unconfirmed: 0
+    },
+    address: 'bitcoincash:qq6mvsm7l92d77zpymmltvaw09p5uzghyuyx7spygg',
+    hdIndex: 1
+  },
+  {
+    balance: {
+      confirmed: 546,
+      unconfirmed: 0
+    },
+    address: 'bitcoincash:qpjdrs8qruzh8xvusdfmutjx62awcepnhyperm3g89',
+    hdIndex: 2
   }
 ]
 
 // Has no addresses with a balance.
 const mockAddressDetails2 = [
   {
-    page: 1,
-    totalPages: 1,
-    itemsOnPage: 1000,
-    address: 'bchtest:qzl37uzel5urphw8dnkerxtlr5mxunvsys062p7g9v',
-    balance: '0',
-    totalReceived: '0',
-    totalSent: '0',
-    unconfirmedBalance: '0',
-    unconfirmedTxs: 0,
-    txs: 0
+    balance: {
+      confirmed: 0,
+      unconfirmed: 0
+    },
+    address: 'bitcoincash:qpjf52s7empfpe0ttrfw52l9an9cjrecyup0p9eue3',
+    hdIndex: 4
   },
   {
-    page: 1,
-    totalPages: 1,
-    itemsOnPage: 1000,
-    address: 'bchtest:qzylf04c9f9d20gndgw9dp82602umwzuuqhnxv7jmn',
-    balance: '0',
-    totalReceived: '0',
-    totalSent: '0',
-    unconfirmedBalance: '0',
-    unconfirmedTxs: 0,
-    txs: 0
+    balance: {
+      confirmed: 0,
+      unconfirmed: 0
+    },
+    address: 'bitcoincash:qz2yrnv9avs3wmh47u0c6x0k63509ysfact33fcx73',
+    hdIndex: 5
   }
 ]
 
