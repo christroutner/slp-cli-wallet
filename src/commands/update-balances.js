@@ -122,6 +122,9 @@ class UpdateBalances extends Command {
       flags.ignoreTokens
     )
     console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
+
+    //
+
     //
     // // Update hasBalance array with non-zero balances.
     // // const hasBalance = this.generateHasBalance(addressData.addressData)
@@ -231,7 +234,7 @@ class UpdateBalances extends Command {
           ignoreTokens
         )
         // console.log(`thisDataBatch: ${util.inspect(thisDataBatch)}`)
-        console.log(`thisDataBatch: ${JSON.stringify(thisDataBatch, null, 2)}`)
+        // console.log(`thisDataBatch: ${JSON.stringify(thisDataBatch, null, 2)}`)
 
         // Increment the index by 20 (addresses).
         currentIndex += 20
@@ -385,12 +388,14 @@ class UpdateBalances extends Command {
   }
 
   // Expects an array of utxo objects and returns two filtered lists. One of
-  // BCH-only UTXOs and the other of SLP-only UTXOs. Any hydrated utxos with
-  // an isValid=null setting is ignored and not included in either list.
+  // BCH-only UTXOs and the other of SLP-only UTXOs.
+  //
+  // Any hydrated utxos with an isValid=null setting is ignored and not
+  // included in either list. This prevents accidentally burning tokens.
   filterUtxos (hydratedUtxos) {
     try {
-      const bchUtxos = []
-      const slpUtxos = []
+      let bchUtxos = []
+      let slpUtxos = []
 
       // Loop through the array of hydrated UTXOs.
       for (let i = 0; i < hydratedUtxos.length; i++) {
@@ -430,9 +435,33 @@ class UpdateBalances extends Command {
         slpUtxos.push(slpUtxoObj)
       }
 
+      // Prune off empty entries from the array.
+      bchUtxos = this.pruneUtxos(bchUtxos)
+      slpUtxos = this.pruneUtxos(slpUtxos)
+
       return { bchUtxos, slpUtxos }
     } catch (err) {
       console.error('Error in filterUtxos()')
+      throw err
+    }
+  }
+
+  // This function expects a UTXO object that contains an array of UTXOs. It
+  // returns an array of UTXOs that contain data. It prunes off any elements that
+  // do not contain UTXO data.
+  pruneUtxos (utxosObj) {
+    try {
+      const prunedUtxos = []
+
+      for (let i = 0; i < utxosObj.length; i++) {
+        const thisElem = utxosObj[i]
+
+        if (thisElem.utxos.length > 0) prunedUtxos.push(thisElem)
+      }
+
+      return prunedUtxos
+    } catch (err) {
+      console.error('Error in pruneUtxos()')
       throw err
     }
   }
