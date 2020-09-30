@@ -179,6 +179,22 @@ const mockWallet1 = {
   ]
 }
 
+const mockWallet2 = {
+  network: 'mainnet',
+  mnemonic:
+    'hero tunnel various dignity harvest equal weekend manage drastic theme bamboo cause',
+  derivation: 245,
+  rootAddress: 'bitcoincash:qrj5p3j59zg2cqt3pe09vgk6w627y7nnzy3c9ffqg3',
+  balance: 0.00014091,
+  nextAddress: 4,
+  hasBalance: [],
+  addresses: [],
+  name: 'temp',
+  balanceConfirmed: 0,
+  balanceUnconfirmed: 0.00014091,
+  SLPUtxos: []
+}
+
 const mockAddressData = [
   {
     page: 1,
@@ -376,6 +392,7 @@ module.exports = {
   mockTokenUtxoDetails,
   mockBalancesForAddress,
   mockWallet1,
+  mockWallet2,
   mockAddressData,
   mockSlpUtxoData
 }
