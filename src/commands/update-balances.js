@@ -123,23 +123,20 @@ class UpdateBalances extends Command {
     )
     console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
 
-    //
+    // Update hasBalance array with non-zero balances.
+    // const hasBalance = this.generateHasBalance(addressData.addressData)
+    const hasBalance = await this.generateHasBalance(
+      addressData.addressData,
+      walletInfo
+    )
+    // console.log(`hasBalance: ${JSON.stringify(hasBalance, null, 2)}`)
 
-    //
-    // // Update hasBalance array with non-zero balances.
-    // // const hasBalance = this.generateHasBalance(addressData.addressData)
-    // const hasBalance = await this.generateHasBalance(
-    //   addressData.addressData,
-    //   walletInfo
-    // )
-    // // console.log(`hasBalance: ${JSON.stringify(hasBalance, null, 2)}`)
-    //
-    // // Sum all the balances in hasBalance to calculate total balance.
-    // const balance = this.sumConfirmedBalances(hasBalance, true)
-    //
-    // // Summarize token balances
-    // this.displayTokenBalances(addressData.slpUtxoData)
-    //
+    // Sum all the balances in hasBalance to calculate total balance.
+    const balance = this.sumConfirmedBalances(hasBalance, true)
+
+    // Summarize token balances
+    this.displayTokenBalances(addressData.slpUtxoData)
+
     // // Save the data to the wallet JSON file.
     // walletInfo.balance = this.appUtils.eightDecimals(
     //   balance.totalConfirmed + balance.totalUnconfirmed
@@ -159,7 +156,7 @@ class UpdateBalances extends Command {
       // console.log(`slpUtxos: ${JSON.stringify(slpUtxos, null, 2)}`)
 
       // Create an array of just token IDs
-      const tokenIds = slpUtxos.map(x => x.tokenId)
+      const tokenIds = slpUtxos.map(x => x.utxos.map(y => y.tokenId))
       // console.log(`tokenIds: ${JSON.stringify(tokenIds, null, 2)}`)
 
       // Create a unique collection of tokenIds
@@ -180,18 +177,22 @@ class UpdateBalances extends Command {
 
         let total = 0
 
-        // Loop through each SLP UTXO. If it matches, the current token ID, add
-        // it to the total.
+        // Loop through each address.
         for (let j = 0; j < slpUtxos.length; j++) {
-          const thisUtxo = slpUtxos[j]
+          // Loop through each UTXO in the current address.
+          // If it matches, the current token ID, add
+          // it to the total.
+          for (let k = 0; k < slpUtxos[j].utxos.length; k++) {
+            const thisUtxo = slpUtxos[j].utxos[k]
 
-          // If the token Ids match.
-          if (thisUtxo.tokenId === thisTokenId) {
-            // Add the ticker to the array.
-            tickers[i] = thisUtxo.tokenTicker
+            // If the token Ids match.
+            if (thisUtxo.tokenId.toString() === thisTokenId.toString()) {
+              // Add the ticker to the array.
+              tickers[i] = thisUtxo.tokenTicker
 
-            // Add the token quantity to the total.
-            total += thisUtxo.tokenQty
+              // Add the token quantity to the total.
+              total += thisUtxo.tokenQty
+            }
           }
         }
 
@@ -371,15 +372,6 @@ class UpdateBalances extends Command {
       const { bchUtxos, slpUtxos } = this.filterUtxos(hydratedUtxos.slpUtxos)
 
       return { balances: balances.balances, bchUtxos, slpUtxos }
-
-      // // get SLP utxo information for the addresses
-      // // DEV NOTE: Replace slpUtxos with an empty [] if you want to ignore
-      // // tokens in a wallet.
-      // let slpUtxos = []
-      // if (!ignoreTokens) slpUtxos = await this.getSlpUtxos(addresses)
-      // // console.log(`slpUtxos: ${JSON.stringify(slpUtxos, null, 2)}`)
-      //
-      // return { balances, slpUtxos }
     } catch (err) {
       console.log('Error: ', err)
       console.log('Error in update-balances.js/getAddressData()')
