@@ -1,0 +1,127 @@
+{
+  "network": "mainnet",
+  "mnemonic": "outside federal engage obvious surprise false truck tray liberty skill pulp ivory",
+  "derivation": 245,
+  "rootAddress": "bitcoincash:qp4lrj5y5kx2htcddy6r8ecc7zpmlwmvlsam3nu39t",
+  "balance": 0.00002392,
+  "nextAddress": 4,
+  "hasBalance": [
+    {
+      "index": 1,
+      "balance": 0,
+      "balanceSat": 0,
+      "unconfirmedBalance": 0.000006,
+      "unconfirmedBalanceSat": 600,
+      "cashAddress": "bitcoincash:qqs62clw026rx85sr4kx66uewnxhysl5cuxk89r2ec"
+    },
+    {
+      "index": 2,
+      "balance": 0,
+      "balanceSat": 0,
+      "unconfirmedBalance": 0.00000546,
+      "unconfirmedBalanceSat": 546,
+      "cashAddress": "bitcoincash:qr9twxwx76sxhlvfhmurvjfmwn5jnzvpgszt9axpu9"
+    },
+    {
+      "index": 3,
+      "balance": 0,
+      "balanceSat": 0,
+      "unconfirmedBalance": 0.00001246,
+      "unconfirmedBalanceSat": 1246,
+      "cashAddress": "bitcoincash:qrt68l0ae3mz00amspjpxt7hapztzdlss5xgs8pkm6"
+    }
+  ],
+  "addresses": [
+    [0, "bitcoincash:qp4lrj5y5kx2htcddy6r8ecc7zpmlwmvlsam3nu39t"],
+    [1, "bitcoincash:qqs62clw026rx85sr4kx66uewnxhysl5cuxk89r2ec"],
+    [2, "bitcoincash:qr9twxwx76sxhlvfhmurvjfmwn5jnzvpgszt9axpu9"],
+    [3, "bitcoincash:qrt68l0ae3mz00amspjpxt7hapztzdlss5xgs8pkm6"]
+  ],
+  "name": "temp",
+  "balanceConfirmed": 0,
+  "balanceUnconfirmed": 0.00002392,
+  "SLPUtxos": [
+    {
+      "address": "bitcoincash:qr9twxwx76sxhlvfhmurvjfmwn5jnzvpgszt9axpu9",
+      "utxos": [
+        {
+          "height": 0,
+          "tx_hash": "70e1ff66c0b57f32eed963ae22fafb3f8159fd374c460a4525a25b53b41f3f34",
+          "tx_pos": 1,
+          "value": 546,
+          "satoshis": 546,
+          "txid": "70e1ff66c0b57f32eed963ae22fafb3f8159fd374c460a4525a25b53b41f3f34",
+          "vout": 1,
+          "utxoType": "token",
+          "transactionType": "send",
+          "tokenId": "a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2",
+          "tokenTicker": "TROUT",
+          "tokenName": "Trout's test token",
+          "tokenDocumentUrl": "troutsblog.com",
+          "tokenDocumentHash": "",
+          "decimals": 2,
+          "tokenType": 1,
+          "tokenQty": 7,
+          "isValid": true
+        }
+      ]
+    },
+    {
+      "address": "bitcoincash:qrt68l0ae3mz00amspjpxt7hapztzdlss5xgs8pkm6",
+      "utxos": [
+        {
+          "height": 0,
+          "tx_hash": "a69a56506fb2bd2ba7af8d478d64423d21aaf9575eacafb7c0d3f6bd72ec5b01",
+          "tx_pos": 1,
+          "value": 546,
+          "satoshis": 546,
+          "txid": "a69a56506fb2bd2ba7af8d478d64423d21aaf9575eacafb7c0d3f6bd72ec5b01",
+          "vout": 1,
+          "utxoType": "token",
+          "transactionType": "send",
+          "tokenId": "6201f3efe486c577433622817b99645e1d473cd3882378f9a0efc128ab839a82",
+          "tokenTicker": "VALENTINE",
+          "tokenName": "Valentine day token",
+          "tokenDocumentUrl": "fullstack.cash",
+          "tokenDocumentHash": "",
+          "decimals": 2,
+          "tokenType": 1,
+          "tokenQty": 6,
+          "isValid": true
+        }
+      ]
+    }
+  ],
+  "BCHUtxos": [
+    {
+      "address": "bitcoincash:qqs62clw026rx85sr4kx66uewnxhysl5cuxk89r2ec",
+      "utxos": [
+        {
+          "height": 0,
+          "tx_hash": "55107cde5b1d9fdc5c82e796c896fec5ecb72c27e3fd30b19b4c944a7d637151",
+          "tx_pos": 0,
+          "value": 600,
+          "satoshis": 600,
+          "txid": "55107cde5b1d9fdc5c82e796c896fec5ecb72c27e3fd30b19b4c944a7d637151",
+          "vout": 0,
+          "isValid": false
+        }
+      ]
+    },
+    {
+      "address": "bitcoincash:qrt68l0ae3mz00amspjpxt7hapztzdlss5xgs8pkm6",
+      "utxos": [
+        {
+          "height": 0,
+          "tx_hash": "692a27f426e5ff57a445c887ead3c541edfbf0f8428a396b8a8e631de9afa8a1",
+          "tx_pos": 0,
+          "value": 700,
+          "satoshis": 700,
+          "txid": "692a27f426e5ff57a445c887ead3c541edfbf0f8428a396b8a8e631de9afa8a1",
+          "vout": 0,
+          "isValid": false
+        }
+      ]
+    }
+  ]
+}

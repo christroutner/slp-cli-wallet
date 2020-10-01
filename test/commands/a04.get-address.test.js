@@ -34,6 +34,7 @@ const deleteFile = () => {
   })
   return prom
 }
+
 describe('get-address', () => {
   let BITBOX
   let getAddress

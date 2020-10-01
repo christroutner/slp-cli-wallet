@@ -103,7 +103,7 @@ describe('#derivation', () => {
 
       const flags = {
         name: 'test123',
-        save: '145'
+        save: '245'
       }
 
       const result = derivation.saveDerivation(flags, filename, mockedWallet)

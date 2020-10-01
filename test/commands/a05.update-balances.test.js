@@ -5,10 +5,13 @@
 
 'use strict'
 
+// Public NPM libraries.
 const assert = require('chai').assert
 const sinon = require('sinon')
 
+// Local libraries.
 const config = require('../../config')
+const testUtil = require('../util/test-util')
 
 // File to be tested.
 const UpdateBalances = require('../../src/commands/update-balances')
@@ -34,6 +37,10 @@ describe('#update-balances.js', () => {
   // const filename = `${__dirname}/../../wallets/test123.json`
   let updateBalances
   let sandbox
+
+  before(() => {
+    testUtil.restoreWallet()
+  })
 
   beforeEach(() => {
     updateBalances = new UpdateBalances()
@@ -407,7 +414,7 @@ describe('#update-balances.js', () => {
         }
 
         const walletInfo = await updateBalances.updateBalances(flags)
-        console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
+        // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
         assert.hasAllKeys(walletInfo, [
           'network',
@@ -421,7 +428,8 @@ describe('#update-balances.js', () => {
           'name',
           'derivation',
           'SLPUtxos',
-          'addresses'
+          'addresses',
+          'BCHUtxos'
         ])
 
         assert.isArray(
