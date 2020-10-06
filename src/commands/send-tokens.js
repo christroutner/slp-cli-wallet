@@ -309,6 +309,7 @@ class SendTokens extends Command {
     }
   }
 
+  // Deprecated.
   // A wrapper for the util library getUTXOs() call. Throws an error if there
   // are no BCH UTXOs to pay for the SLP transaction miner fees.
   // async getBchUtxos (walletInfo) {

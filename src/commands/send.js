@@ -66,7 +66,8 @@ class Send extends Command {
       walletInfo = await updateBalances.updateBalances(flags)
 
       // Get info on UTXOs controlled by this wallet.
-      const utxos = await this.appUtils.getUTXOs(walletInfo)
+      // const utxos = await this.appUtils.getUTXOs(walletInfo)
+      const utxos = walletInfo.BCHUtxos
       // console.log(`send utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Select optimal UTXO
@@ -211,10 +212,11 @@ class Send extends Command {
 
     console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
-    // Loop through all the UTXOs.
+    // Loop through each address.
     for (var i = 0; i < utxos.length; i++) {
       const thisAddr = utxos[i]
 
+      // Loop through each UTXO for each address.
       for (let j = 0; j < thisAddr.utxos.length; j++) {
         const thisUTXO = thisAddr.utxos[j]
 

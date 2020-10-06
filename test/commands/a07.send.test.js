@@ -117,11 +117,11 @@ describe('send', () => {
 
       const bch = 0.00005
       // const utxos = bitboxMock.Address.utxo()
-      const utxos = mockData.mockUnspentUtxo
+      const utxos = mockData.mockSingleUtxos
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       const utxo = await send.selectUTXO(bch, utxos)
-      // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       assert.isObject(utxo, 'Expect single utxo object')
       assert.hasAllKeys(utxo, [
@@ -130,12 +130,13 @@ describe('send', () => {
         'amount',
         'satoshis',
         'height',
-        'confirmations'
-        // "hdIndex"
+        'tx_hash',
+        'tx_pos',
+        'value',
+        'isValid',
+        'address',
+        'hdIndex'
       ])
-
-      // Since this test uses mocked data, the values are known ahead of time.
-      assert.equal(utxo.amount, 0.00006)
     })
 
     it('should reject if output is less than dust', async () => {
