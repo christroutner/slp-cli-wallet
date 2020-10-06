@@ -78,7 +78,8 @@ class SendAll extends Command {
       walletInfo = await updateBalances.updateBalances(flags)
 
       // Get all UTXOs controlled by this wallet.
-      const utxos = await appUtils.getUTXOs(walletInfo)
+      // const utxos = await appUtils.getUTXOs(walletInfo)
+      const utxos = await walletInfo.BCHUtxos
       // console.log(`utxos: ${util.inspect(utxos)}`)
 
       // Send the BCH, transfer change to the new address
@@ -116,15 +117,24 @@ class SendAll extends Command {
       } else transactionBuilder = new this.BITBOX.TransactionBuilder()
 
       let originalAmount = 0
+      let numUtxos = 0
 
       // Calulate the original amount in the wallet and add all UTXOs to the
       // transaction builder.
       for (let i = 0; i < utxos.length; i++) {
-        const utxo = utxos[i]
+        // Loop through each address.
+        const addr = utxos[i]
+        for (let j = 0; j < addr.utxos.length; j++) {
+          // Loop through each UTXO in the address.
+          const utxo = addr.utxos[j]
+          // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
-        originalAmount = originalAmount + utxo.satoshis
+          originalAmount = originalAmount + utxo.satoshis
 
-        transactionBuilder.addInput(utxo.txid, utxo.vout)
+          transactionBuilder.addInput(utxo.txid, utxo.vout)
+
+          numUtxos++
+        }
       }
 
       if (originalAmount < 1) {
@@ -136,7 +146,7 @@ class SendAll extends Command {
 
       // get byte count to calculate fee. paying 1 sat/byte
       const byteCount = this.BITBOX.BitcoinCash.getByteCount(
-        { P2PKH: utxos.length },
+        { P2PKH: numUtxos },
         { P2PKH: 1 }
       )
       const fee = Math.ceil(1.1 * byteCount)
@@ -153,25 +163,35 @@ class SendAll extends Command {
       )
 
       let redeemScript
+      let inputCnt = 0
 
       // Loop through each input and sign
+      // Loop through each address.
       for (let i = 0; i < utxos.length; i++) {
-        const utxo = utxos[i]
+        const addr = utxos[i]
 
-        // Generate a keypair for the current address.
-        const change = await appUtils.changeAddrFromMnemonic(
-          walletInfo,
-          utxo.hdIndex
-        )
-        const keyPair = this.BITBOX.HDNode.toKeyPair(change)
+        // Loop through each utxo within the address.
+        for (let j = 0; j < addr.utxos.length; j++) {
+          const utxo = addr.utxos[j]
+          // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
-        transactionBuilder.sign(
-          i,
-          keyPair,
-          redeemScript,
-          transactionBuilder.hashTypes.SIGHASH_ALL,
-          utxo.satoshis
-        )
+          // Generate a keypair for the current address.
+          const change = await appUtils.changeAddrFromMnemonic(
+            walletInfo,
+            utxo.hdIndex
+          )
+          const keyPair = this.BITBOX.HDNode.toKeyPair(change)
+
+          transactionBuilder.sign(
+            inputCnt,
+            keyPair,
+            redeemScript,
+            transactionBuilder.hashTypes.SIGHASH_ALL,
+            utxo.satoshis
+          )
+
+          inputCnt++
+        }
       }
 
       // build tx

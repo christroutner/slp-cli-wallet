@@ -385,7 +385,7 @@ class UpdateBalances extends Command {
 
       // Hydrate UTXO data with SLP info.
       const hydratedUtxos = await this.bchjs.SLP.Utils.hydrateUtxos(utxos.utxos)
-      console.log(`hydratedUtxos: ${JSON.stringify(hydratedUtxos, null, 2)}`)
+      // console.log(`hydratedUtxos: ${JSON.stringify(hydratedUtxos, null, 2)}`)
 
       // Add the hdIndex and address to each UTXO.
       // Loop through each address.
@@ -708,8 +708,9 @@ class UpdateBalances extends Command {
 
       const result = await this.bchjs.SLP.TokenType1.axios.request(options)
       details = [...details, ...result.data.details]
+      // console.log(`details: ${JSON.stringify(details, null, 2)}`)
 
-      return details
+      return details[0]
     } catch (err) {
       console.error('Error in bckupValidate()')
       throw err
