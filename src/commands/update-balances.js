@@ -123,6 +123,13 @@ class UpdateBalances extends Command {
     )
     // console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
 
+    // Exit if this is a new wallet that does not need to be updated.
+    if (addressData.addressData.length === 0) {
+      return {
+        balance: 0
+      }
+    }
+
     // Update hasBalance array with non-zero balances.
     // const hasBalance = this.generateHasBalance(addressData.addressData)
     const hasBalance = await this.generateHasBalance(
@@ -157,7 +164,10 @@ class UpdateBalances extends Command {
       // console.log(`slpUtxos: ${JSON.stringify(slpUtxos, null, 2)}`)
 
       // Create an array of just token IDs
-      const tokenIds = slpUtxos.map(x => x.utxos.map(y => y.tokenId))
+      let tokenIds = slpUtxos.map(x => x.utxos.map(y => y.tokenId))
+
+      // Flatten the array.
+      tokenIds = tokenIds.flat()
       // console.log(`tokenIds: ${JSON.stringify(tokenIds, null, 2)}`)
 
       // Create a unique collection of tokenIds
@@ -375,10 +385,31 @@ class UpdateBalances extends Command {
 
       // Hydrate UTXO data with SLP info.
       const hydratedUtxos = await this.bchjs.SLP.Utils.hydrateUtxos(utxos.utxos)
+
+      // Add the hdIndex and address to each UTXO.
+      // Loop through each address.
+      for (let i = 0; i < hydratedUtxos.slpUtxos.length; i++) {
+        const thisAddr = hydratedUtxos.slpUtxos[i].address
+        const theseUtxos = hydratedUtxos.slpUtxos[i].utxos
+
+        // Look up the HD Index for this address.
+        const hdIndex = balances.balances.filter(x => x.address === thisAddr)
+        // console.log(`hdIndex: ${JSON.stringify(hdIndex, null, 2)}`)
+
+        // Loop through each UTXO in the address.
+        for (let j = 0; j < theseUtxos.length; j++) {
+          const thisUtxo = theseUtxos[j]
+
+          thisUtxo.address = thisAddr
+          thisUtxo.hdIndex = hdIndex[0].hdIndex
+        }
+      }
       // console.log(`hydratedUtxos: ${JSON.stringify(hydratedUtxos, null, 2)}`)
 
       // Filter out the SLP and BCH UTXOs.
-      const { bchUtxos, slpUtxos } = this.filterUtxos(hydratedUtxos.slpUtxos)
+      const { bchUtxos, slpUtxos } = await this.filterUtxos(
+        hydratedUtxos.slpUtxos
+      )
 
       return { balances: balances.balances, bchUtxos, slpUtxos }
     } catch (err) {
@@ -393,7 +424,7 @@ class UpdateBalances extends Command {
   //
   // Any hydrated utxos with an isValid=null setting is ignored and not
   // included in either list. This prevents accidentally burning tokens.
-  filterUtxos (hydratedUtxos) {
+  async filterUtxos (hydratedUtxos) {
     try {
       let bchUtxos = []
       let slpUtxos = []
@@ -414,21 +445,23 @@ class UpdateBalances extends Command {
 
         // Loop through the UTXOs in each object.
         for (let j = 0; j < thisUtxoObj.utxos.length; j++) {
-          const thisUtxo = thisUtxoObj.utxos[j]
+          let thisUtxo = thisUtxoObj.utxos[j]
+
+          // Hydrate the UTXO using slp-api if SLPDB returns null.
+          if (thisUtxo.isValid === null) {
+            console.warn(
+              `Warning: Unvalidated UTXO detected: ${thisUtxo.tx_hash}`
+            )
+            thisUtxo = await this.bkupValidate(thisUtxo)
+          }
 
           // Add if this is an SLP UTXO.
           if (thisUtxo.isValid) {
             slpUtxoObj.utxos.push(thisUtxo)
 
             // Add if this is a BCH UTXO
-          } else if (thisUtxo.isValid === false) {
-            bchUtxoObj.utxos.push(thisUtxo)
-
-            // Warn if an isValid=null UTXO is detected. That means that SLPDB has
-            // not processed the UTXO or the hydrateUtxos() call is returning 429
-            // errors.
           } else {
-            console.log('Warning: Unvalidated UTXO detected.')
+            bchUtxoObj.utxos.push(thisUtxo)
           }
         }
 
@@ -615,7 +648,7 @@ class UpdateBalances extends Command {
 
       return hasBalance
     } catch (err) {
-      console.log('Error in update-balances.js/generateHasBalance()')
+      console.log('Error in update-balances.js/generateHasBalance(): ', err)
       throw err
     }
   }
@@ -653,6 +686,30 @@ class UpdateBalances extends Command {
       return total
     } catch (err) {
       console.log('Error in update-balances.js/sumConfirmedBalances()')
+      throw err
+    }
+  }
+
+  // Backup SLP Validation. Hydrate the UTXO using slp-api. This is a backup
+  // method that is slower, but independent of SLPDB.
+  async bkupValidate (utxo) {
+    try {
+      const options = {
+        method: 'POST',
+        url: 'https://slp-api.fullstack.cash/slp/hydrateUtxos',
+        data: {
+          utxos: [utxo]
+        }
+      }
+
+      let details = []
+
+      const result = await this.bchjs.SLP.TokenType1.axios.request(options)
+      details = [...details, ...result.data.details]
+
+      return details
+    } catch (err) {
+      console.error('Error in bckupValidate()')
       throw err
     }
   }

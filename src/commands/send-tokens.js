@@ -84,7 +84,7 @@ class SendTokens extends Command {
 
       // Get a list of BCH UTXOs in this wallet that can be used to pay for
       // the transaction fee.
-      const utxos = await this.getBchUtxos(walletInfo)
+      // const utxos = await this.getBchUtxos(walletInfo)
       // console.log(`send utxos: ${util.inspect(utxos)}`)
 
       // Instatiate the Send class so this function can reuse its selectUTXO() code.
@@ -98,9 +98,9 @@ class SendTokens extends Command {
 
       // Select optimal UTXO
       // TODO: Figure out the appropriate amount of BCH to use in selectUTXO()
-      const utxo = await send.selectUTXO(0.000015, utxos)
+      const utxo = await send.selectUTXO(0.000015, walletInfo.BCHUtxos)
       // 1500 satoshis used until a more accurate calculation can be devised.
-      // console.log(`selected utxo: ${util.inspect(utxo)}`)
+      console.log(`selected utxo: ${util.inspect(utxo)}`)
 
       // Exit if there is no UTXO big enough to fulfill the transaction.
       if (!utxo.amount) {
@@ -146,7 +146,8 @@ class SendTokens extends Command {
     tokenUtxos
   ) {
     try {
-      // console.log(`utxo: ${util.inspect(utxo)}`)
+      console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
 
       // instance of transaction builder
       let transactionBuilder
@@ -157,8 +158,8 @@ class SendTokens extends Command {
       // const satoshisToSend = Math.floor(bch * 100000000)
       // console.log(`Amount to send in satoshis: ${satoshisToSend}`)
       const originalAmount = utxo.satoshis
-      const vout = utxo.vout
-      const txid = utxo.txid
+      const vout = utxo.tx_pos
+      const txid = utxo.tx_hash
 
       // add input utxo to pay for transaction.
       transactionBuilder.addInput(txid, vout)
@@ -283,13 +284,23 @@ class SendTokens extends Command {
   // if no UTXOs for that token can be found.
   getTokenUtxos (tokenId, walletInfo) {
     try {
-      const tokenUtxos = walletInfo.SLPUtxos.filter(x => x.tokenId === tokenId)
+      // const tokenUtxos = walletInfo.SLPUtxos.filter(x => x.tokenId === tokenId)
+
+      // Create an array of the UTXOs in the wallet that are associated with the
+      // target token.
+      let tokenUtxos = walletInfo.SLPUtxos.map(elem =>
+        elem.utxos.filter(x => x.tokenId === tokenId)
+      )
+
+      // Flatten the array.
+      tokenUtxos = tokenUtxos.flat()
+
       if (tokenUtxos.length === 0) {
         throw new Error('No tokens in the wallet matched the given token ID.')
       }
 
       // For debugging:
-      // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
+      console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
 
       return tokenUtxos
     } catch (err) {
@@ -300,21 +311,21 @@ class SendTokens extends Command {
 
   // A wrapper for the util library getUTXOs() call. Throws an error if there
   // are no BCH UTXOs to pay for the SLP transaction miner fees.
-  async getBchUtxos (walletInfo) {
-    try {
-      const utxos = await this.appUtils.getUTXOs(walletInfo)
-      if (utxos.length === 0) {
-        throw new Error(
-          'No BCH UTXOs found in wallet. No way to pay miner fees for transaction.'
-        )
-      }
-
-      return utxos
-    } catch (err) {
-      this.log('Error in send-tokens.js/getBchUtxos().')
-      throw err
-    }
-  }
+  // async getBchUtxos (walletInfo) {
+  //   try {
+  //     const utxos = await this.appUtils.getUTXOs(walletInfo)
+  //     if (utxos.length === 0) {
+  //       throw new Error(
+  //         'No BCH UTXOs found in wallet. No way to pay miner fees for transaction.'
+  //       )
+  //     }
+  //
+  //     return utxos
+  //   } catch (err) {
+  //     this.log('Error in send-tokens.js/getBchUtxos().')
+  //     throw err
+  //   }
+  // }
 
   // Validate the proper flags are passed in.
   validateFlags (flags) {
