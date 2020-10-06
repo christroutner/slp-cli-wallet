@@ -198,9 +198,9 @@ describe('#burn-tokens', () => {
         sandbox
           .stub(burnTokens.sendTokens, 'getTokenUtxos')
           .resolves(burnMocks.tokenUtxo)
-        sandbox
-          .stub(burnTokens.sendTokens, 'getBchUtxos')
-          .resolves(burnMocks.bchUtxo)
+        // sandbox
+        //   .stub(burnTokens.sendTokens, 'getBchUtxos')
+        //   .resolves(burnMocks.bchUtxo)
         sandbox.stub(burnTokens.send, 'selectUTXO').resolves(burnMocks.bchUtxo)
         sandbox
           .stub(burnTokens.getAddress, 'getAddress')
@@ -231,9 +231,9 @@ describe('#burn-tokens', () => {
         sandbox
           .stub(burnTokens.sendTokens, 'getTokenUtxos')
           .resolves(burnMocks.tokenUtxo)
-        sandbox
-          .stub(burnTokens.sendTokens, 'getBchUtxos')
-          .resolves(burnMocks.bchUtxo)
+        // sandbox
+        //   .stub(burnTokens.sendTokens, 'getBchUtxos')
+        //   .resolves(burnMocks.bchUtxo)
         sandbox.stub(burnTokens.send, 'selectUTXO').resolves(burnMocks.bchUtxo)
         sandbox
           .stub(burnTokens.getAddress, 'getAddress')
@@ -263,9 +263,9 @@ describe('#burn-tokens', () => {
       sandbox
         .stub(burnTokens.sendTokens, 'getTokenUtxos')
         .resolves(burnMocks.tokenUtxo)
-      sandbox
-        .stub(burnTokens.sendTokens, 'getBchUtxos')
-        .resolves(burnMocks.bchUtxo)
+      // sandbox
+      //   .stub(burnTokens.sendTokens, 'getBchUtxos')
+      //   .resolves(burnMocks.bchUtxo)
       sandbox.stub(burnTokens.send, 'selectUTXO').resolves([])
 
       const flags = {
