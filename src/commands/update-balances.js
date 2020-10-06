@@ -502,66 +502,67 @@ class UpdateBalances extends Command {
     }
   }
 
+  // Deprecated. CT 10-6-2020
   // This function expects an array of up to 20 addresses as input.
   // Retrieve SLP Utxo information that will be saved to the wallet file.
-  async getSlpUtxos (addresses) {
-    try {
-      // Validate input.
-      if (!Array.isArray(addresses)) {
-        throw new Error('addresses must be an array')
-      }
-      if (addresses.length > 20) {
-        throw new Error('addresses array must be 20 or fewer elements.')
-      }
-
-      // console.log(`bchjs.apiToken: ${this.bchjs.apiToken}`)
-
-      // Check addresses to see if they contain any SLP tokens.
-      // Pings SLPDB with an optimized query.
-      // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
-      const slpBalances = await this.bchjs.SLP.Utils.balancesForAddress(
-        addresses
-      )
-      // console.log(`slpBalances: ${JSON.stringify(slpBalances, null, 2)}`)
-
-      // Remove empty arrays (addresses that have no tokens).
-      const consolidatedBalances = slpBalances.filter(x => {
-        if (x.length > 0) return x
-      })
-      // console.log(
-      //   `consolidatedBalances: ${JSON.stringify(consolidatedBalances, null, 2)}`
-      // )
-
-      // Loop through each address that has SLP tokens.
-      let slpUtxos = []
-      for (let i = 0; i < consolidatedBalances.length; i++) {
-        const thisAddress = consolidatedBalances[i][0].slpAddress
-        // console.log(`thisAddress: ${JSON.stringify(thisAddress, null, 2)}`)
-
-        // Get all SLP token UTXOs associated with this address.
-        let tokenUtxos = []
-        try {
-          tokenUtxos = await this.findSlpUtxos(thisAddress)
-
-          // Filter out any tokenUtxos that have 'isValid' set to false
-          tokenUtxos = tokenUtxos.filter(x => x.isValid !== false)
-        } catch (err) {}
-        // const tokenUtxos = [] // Empty array to force-ignore tokens.
-        // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
-
-        // Combine token data.
-        // tokenUtxos
-
-        // Merge any new UTXOs in with the list.
-        slpUtxos = slpUtxos.concat(tokenUtxos)
-      }
-
-      return slpUtxos
-    } catch (err) {
-      console.log('Error in update-balances.js/getSlpUtxos().')
-      throw err
-    }
-  }
+  // async getSlpUtxos (addresses) {
+  //   try {
+  //     // Validate input.
+  //     if (!Array.isArray(addresses)) {
+  //       throw new Error('addresses must be an array')
+  //     }
+  //     if (addresses.length > 20) {
+  //       throw new Error('addresses array must be 20 or fewer elements.')
+  //     }
+  //
+  //     // console.log(`bchjs.apiToken: ${this.bchjs.apiToken}`)
+  //
+  //     // Check addresses to see if they contain any SLP tokens.
+  //     // Pings SLPDB with an optimized query.
+  //     // console.log(`addresses: ${JSON.stringify(addresses, null, 2)}`)
+  //     const slpBalances = await this.bchjs.SLP.Utils.balancesForAddress(
+  //       addresses
+  //     )
+  //     // console.log(`slpBalances: ${JSON.stringify(slpBalances, null, 2)}`)
+  //
+  //     // Remove empty arrays (addresses that have no tokens).
+  //     const consolidatedBalances = slpBalances.filter(x => {
+  //       if (x.length > 0) return x
+  //     })
+  //     // console.log(
+  //     //   `consolidatedBalances: ${JSON.stringify(consolidatedBalances, null, 2)}`
+  //     // )
+  //
+  //     // Loop through each address that has SLP tokens.
+  //     let slpUtxos = []
+  //     for (let i = 0; i < consolidatedBalances.length; i++) {
+  //       const thisAddress = consolidatedBalances[i][0].slpAddress
+  //       // console.log(`thisAddress: ${JSON.stringify(thisAddress, null, 2)}`)
+  //
+  //       // Get all SLP token UTXOs associated with this address.
+  //       let tokenUtxos = []
+  //       try {
+  //         tokenUtxos = await this.findSlpUtxos(thisAddress)
+  //
+  //         // Filter out any tokenUtxos that have 'isValid' set to false
+  //         tokenUtxos = tokenUtxos.filter(x => x.isValid !== false)
+  //       } catch (err) {}
+  //       // const tokenUtxos = [] // Empty array to force-ignore tokens.
+  //       // console.log(`tokenUtxos: ${JSON.stringify(tokenUtxos, null, 2)}`)
+  //
+  //       // Combine token data.
+  //       // tokenUtxos
+  //
+  //       // Merge any new UTXOs in with the list.
+  //       slpUtxos = slpUtxos.concat(tokenUtxos)
+  //     }
+  //
+  //     return slpUtxos
+  //   } catch (err) {
+  //     console.log('Error in update-balances.js/getSlpUtxos().')
+  //     throw err
+  //   }
+  // }
 
   // Retrieves SLP Utxos for an address that has been identified to be holding
   // SLP tokens.

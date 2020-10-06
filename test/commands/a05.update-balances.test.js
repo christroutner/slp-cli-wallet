@@ -10,7 +10,7 @@ const assert = require('chai').assert
 const sinon = require('sinon')
 
 // Local libraries.
-const config = require('../../config')
+// const config = require('../../config')
 const testUtil = require('../util/test-util')
 
 // File to be tested.
@@ -142,82 +142,82 @@ describe('#update-balances.js', () => {
     })
   })
 
-  describe('#getSlpUtxos', () => {
-    it('should throw error if input is not an array', async () => {
-      try {
-        const addresses = 'bad-data'
-
-        await updateBalances.getSlpUtxos(addresses)
-
-        assert.equal(true, false, 'Unexpected result!')
-      } catch (err) {
-        // console.log(`Error: `, err)
-
-        assert.include(err.message, 'addresses must be an array')
-      }
-    })
-
-    it('should reject arrays bigger than 20', async () => {
-      try {
-        // Generate an array that is bigger than 20 elements.
-        const addresses = []
-        for (let i = 0; i < 25; i++) addresses.push(i)
-
-        await updateBalances.getSlpUtxos(addresses)
-
-        assert.equal(true, false, 'Unexpected result!')
-      } catch (err) {
-        // console.log(`Error: `, err)
-
-        assert.include(
-          err.message,
-          'addresses array must be 20 or fewer elements'
-        )
-      }
-    })
-
-    it('should return information on any address with UTXO information', async () => {
-      updateBalances.bchjs = new config.BCHLIB({
-        restURL: config.MAINNET_REST
-      })
-
-      // Mock external calls if this is a unit test.
-      if (process.env.TEST === 'unit') {
-        sandbox
-          .stub(updateBalances.bchjs.Util, 'balancesForAddress')
-          .resolves(updateBalancesMocks.mockBalancesForAddress)
-
-        sandbox
-          .stub(updateBalances, 'findSlpUtxos')
-          .resolves(updateBalancesMocks.mockTokenUtxoDetails)
-      }
-
-      const addresses = [
-        'bitcoincash:qqll3st8xl0k8cgv8dgrrrkntv6hqdn8huv3xm2ztf'
-      ]
-
-      const result = await updateBalances.getSlpUtxos(addresses)
-      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
-
-      assert.isArray(result)
-      assert.hasAnyKeys(result[0], [
-        'txid',
-        'vout',
-        'amount',
-        'satoshis',
-        'height',
-        'confirmations',
-        'utxoType',
-        'tokenId',
-        'tokenTicker',
-        'tokenName',
-        'tokenDocumentUrl',
-        'tokenDocumentHash',
-        'decimals',
-        'tokenQty'
-      ])
-    })
-  })
+  // describe('#getSlpUtxos', () => {
+  //   it('should throw error if input is not an array', async () => {
+  //     try {
+  //       const addresses = 'bad-data'
+  //
+  //       await updateBalances.getSlpUtxos(addresses)
+  //
+  //       assert.equal(true, false, 'Unexpected result!')
+  //     } catch (err) {
+  //       // console.log(`Error: `, err)
+  //
+  //       assert.include(err.message, 'addresses must be an array')
+  //     }
+  //   })
+  //
+  //   it('should reject arrays bigger than 20', async () => {
+  //     try {
+  //       // Generate an array that is bigger than 20 elements.
+  //       const addresses = []
+  //       for (let i = 0; i < 25; i++) addresses.push(i)
+  //
+  //       await updateBalances.getSlpUtxos(addresses)
+  //
+  //       assert.equal(true, false, 'Unexpected result!')
+  //     } catch (err) {
+  //       // console.log(`Error: `, err)
+  //
+  //       assert.include(
+  //         err.message,
+  //         'addresses array must be 20 or fewer elements'
+  //       )
+  //     }
+  //   })
+  //
+  //   it('should return information on any address with UTXO information', async () => {
+  //     updateBalances.bchjs = new config.BCHLIB({
+  //       restURL: config.MAINNET_REST
+  //     })
+  //
+  //     // Mock external calls if this is a unit test.
+  //     if (process.env.TEST === 'unit') {
+  //       sandbox
+  //         .stub(updateBalances.bchjs.Util, 'balancesForAddress')
+  //         .resolves(updateBalancesMocks.mockBalancesForAddress)
+  //
+  //       sandbox
+  //         .stub(updateBalances, 'findSlpUtxos')
+  //         .resolves(updateBalancesMocks.mockTokenUtxoDetails)
+  //     }
+  //
+  //     const addresses = [
+  //       'bitcoincash:qqll3st8xl0k8cgv8dgrrrkntv6hqdn8huv3xm2ztf'
+  //     ]
+  //
+  //     const result = await updateBalances.getSlpUtxos(addresses)
+  //     // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+  //
+  //     assert.isArray(result)
+  //     assert.hasAnyKeys(result[0], [
+  //       'txid',
+  //       'vout',
+  //       'amount',
+  //       'satoshis',
+  //       'height',
+  //       'confirmations',
+  //       'utxoType',
+  //       'tokenId',
+  //       'tokenTicker',
+  //       'tokenName',
+  //       'tokenDocumentUrl',
+  //       'tokenDocumentHash',
+  //       'decimals',
+  //       'tokenQty'
+  //     ])
+  //   })
+  // })
 
   describe('#getAddressData', () => {
     it('should throw error if index is not supplied', async () => {
