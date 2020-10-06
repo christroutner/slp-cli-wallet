@@ -100,7 +100,7 @@ class SendTokens extends Command {
       // TODO: Figure out the appropriate amount of BCH to use in selectUTXO()
       const utxo = await send.selectUTXO(0.000015, walletInfo.BCHUtxos)
       // 1500 satoshis used until a more accurate calculation can be devised.
-      console.log(`selected utxo: ${util.inspect(utxo)}`)
+      // console.log(`selected utxo: ${util.inspect(utxo)}`)
 
       // Exit if there is no UTXO big enough to fulfill the transaction.
       if (!utxo.amount) {
