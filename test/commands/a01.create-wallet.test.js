@@ -123,8 +123,10 @@ describe('create-wallet', () => {
     // For an integration test, ensure the rootAddress actually reflects mainnet.
     if (process.env.TEST !== 'unit') { assert.equal(walletData.rootAddress.indexOf('bchtest') > -1, true) }
   })
+
   it('Should exit with error status if called with a filename that already exists.', async () => {
     const filename = `${__dirname}/../../wallets/test123.json`
+
     try {
       await createWallet.createWallet(filename, 'testnet')
     } catch (err) {

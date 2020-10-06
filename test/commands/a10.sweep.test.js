@@ -101,25 +101,27 @@ describe('Sweep', () => {
   })
 
   describe('#getBalance()', () => {
-    it('should return balance', async () => {
-      sweep.BITBOX = new config.BCHLIB({ restURL: config.MAINNET_REST })
+    if (process.env.TEST === 'unit') {
+      it('should return balance', async () => {
+        sweep.BITBOX = new config.BCHLIB({ restURL: config.MAINNET_REST })
 
-      const flags = {
-        wif: 'KzGSsGMuFgtwkTyT3T8jwS1yUNov2j79D4qoP3SnBDdiAJBKK9Te'
-      }
+        const flags = {
+          wif: 'KzGSsGMuFgtwkTyT3T8jwS1yUNov2j79D4qoP3SnBDdiAJBKK9Te'
+        }
 
-      // Use mocked data if this is a unit test.
-      if (process.env.TEST === 'unit') {
-        sandbox
-          .stub(sweep.BITBOX.Blockbook, 'balance')
-          .resolves(mockData.mockBalance1)
-      }
+        // Use mocked data if this is a unit test.
+        if (process.env.TEST === 'unit') {
+          sandbox
+            .stub(sweep.BITBOX.Blockbook, 'balance')
+            .resolves(mockData.mockBalance1)
+        }
 
-      const result = await sweep.getBalance(flags)
-      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+        const result = await sweep.getBalance(flags)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
-      assert.isAbove(result, 0)
-    })
+        assert.isAbove(result, 0)
+      })
+    }
   })
 
   describe('#getTokens()', () => {
@@ -165,53 +167,55 @@ describe('Sweep', () => {
       }
     })
 
-    it('should return BCH utxos and no token UTXOs.', async () => {
-      // Use mocked data if this is a unit test.
-      if (process.env.TEST === 'unit') {
-        sandbox
-          .stub(sweep.BITBOX.Blockbook, 'utxo')
-          .resolves(mockData.bchOnlyUtxos)
+    if (process.env.TEST === 'unit') {
+      it('should return BCH utxos and no token UTXOs.', async () => {
+        // Use mocked data if this is a unit test.
+        if (process.env.TEST === 'unit') {
+          sandbox
+            .stub(sweep.BITBOX.Blockbook, 'utxo')
+            .resolves(mockData.bchOnlyUtxos)
 
-        sandbox
-          .stub(sweep.BITBOX.Util, 'tokenUtxoDetails')
-          .resolves(mockData.bchOnlyTokenInfo)
-      }
+          sandbox
+            .stub(sweep.BITBOX.Util, 'tokenUtxoDetails')
+            .resolves(mockData.bchOnlyTokenInfo)
+        }
 
-      const flags = {
-        wif: 'KyC3XUbsYfvtR5dPDqSWUq2Z6sbW9fKCG3JB4bH1YVEE74nPUK9F'
-      }
+        const flags = {
+          wif: 'KyC3XUbsYfvtR5dPDqSWUq2Z6sbW9fKCG3JB4bH1YVEE74nPUK9F'
+        }
 
-      const result = await sweep.getTokens(flags)
-      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+        const result = await sweep.getTokens(flags)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
-      assert.hasAllKeys(result, ['bchUtxos', 'tokenUtxos'])
-      assert.isNotEmpty(result.bchUtxos)
-      assert.isEmpty(result.tokenUtxos)
-    })
+        assert.hasAllKeys(result, ['bchUtxos', 'tokenUtxos'])
+        assert.isNotEmpty(result.bchUtxos)
+        assert.isEmpty(result.tokenUtxos)
+      })
 
-    it('should return both BCH and token UTXOs.', async () => {
-      // Use mocked data if this is a unit test.
-      if (process.env.TEST === 'unit') {
-        sandbox
-          .stub(sweep.BITBOX.Blockbook, 'utxo')
-          .resolves(mockData.bothUtxos)
+      it('should return both BCH and token UTXOs.', async () => {
+        // Use mocked data if this is a unit test.
+        if (process.env.TEST === 'unit') {
+          sandbox
+            .stub(sweep.BITBOX.Blockbook, 'utxo')
+            .resolves(mockData.bothUtxos)
 
-        sandbox
-          .stub(sweep.BITBOX.Util, 'tokenUtxoDetails')
-          .resolves(mockData.bothTokenInfo)
-      }
+          sandbox
+            .stub(sweep.BITBOX.Util, 'tokenUtxoDetails')
+            .resolves(mockData.bothTokenInfo)
+        }
 
-      const flags = {
-        wif: 'KxQ615REGBjtbd1HVjT8of8dfzVte1xw3sURBp7ZQ8s4wXhmSWXC'
-      }
+        const flags = {
+          wif: 'KxQ615REGBjtbd1HVjT8of8dfzVte1xw3sURBp7ZQ8s4wXhmSWXC'
+        }
 
-      const result = await sweep.getTokens(flags)
-      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+        const result = await sweep.getTokens(flags)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
-      assert.hasAllKeys(result, ['bchUtxos', 'tokenUtxos'])
-      assert.isNotEmpty(result.bchUtxos)
-      assert.isNotEmpty(result.tokenUtxos)
-    })
+        assert.hasAllKeys(result, ['bchUtxos', 'tokenUtxos'])
+        assert.isNotEmpty(result.bchUtxos)
+        assert.isNotEmpty(result.tokenUtxos)
+      })
+    }
   })
 
   describe('#sweepBCH', () => {
@@ -238,24 +242,26 @@ describe('Sweep', () => {
 
     // it should throw an error if UTXO balance is too small
 
-    it('should sweep funds', async () => {
-      // Use mocked data if this is a unit test.
-      if (process.env.TEST === 'unit') {
-        sandbox
-          .stub(sweep.BITBOX.Blockbook, 'utxo')
-          .resolves(mockData.bchOnlyUtxos)
-      }
+    if (process.env.TEST === 'unit') {
+      it('should sweep funds', async () => {
+        // Use mocked data if this is a unit test.
+        if (process.env.TEST === 'unit') {
+          sandbox
+            .stub(sweep.BITBOX.Blockbook, 'utxo')
+            .resolves(mockData.bchOnlyUtxos)
+        }
 
-      const flags = {
-        wif: 'KzGSsGMuFgtwkTyT3T8jwS1yUNov2j79D4qoP3SnBDdiAJBKK9Te',
-        address: 'bitcoincash:qqtc3vqfzz050jkvcfjvtzj392lf6wlqhun3fw66n9'
-      }
+        const flags = {
+          wif: 'KzGSsGMuFgtwkTyT3T8jwS1yUNov2j79D4qoP3SnBDdiAJBKK9Te',
+          address: 'bitcoincash:qqtc3vqfzz050jkvcfjvtzj392lf6wlqhun3fw66n9'
+        }
 
-      const result = await sweep.sweepBCH(flags)
-      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+        const result = await sweep.sweepBCH(flags)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
-      assert.isString(result[0], 'Returned value should be a hex tx string.')
-    })
+        assert.isString(result[0], 'Returned value should be a hex tx string.')
+      })
+    }
   })
 
   describe('#sweepTokens', () => {

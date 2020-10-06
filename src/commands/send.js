@@ -66,7 +66,8 @@ class Send extends Command {
       walletInfo = await updateBalances.updateBalances(flags)
 
       // Get info on UTXOs controlled by this wallet.
-      const utxos = await this.appUtils.getUTXOs(walletInfo)
+      // const utxos = await this.appUtils.getUTXOs(walletInfo)
+      const utxos = walletInfo.BCHUtxos
       // console.log(`send utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Select optimal UTXO
@@ -112,7 +113,9 @@ class Send extends Command {
 
       // instance of transaction builder
       let transactionBuilder
-      if (walletInfo.network === 'testnet') { transactionBuilder = new this.BITBOX.TransactionBuilder('testnet') } else transactionBuilder = new this.BITBOX.TransactionBuilder()
+      if (walletInfo.network === 'testnet') {
+        transactionBuilder = new this.BITBOX.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.BITBOX.TransactionBuilder()
 
       const satoshisToSend = Math.floor(bch * 100000000)
       // console.log(`Amount to send in satoshis: ${satoshisToSend}`)
@@ -207,43 +210,54 @@ class Send extends Command {
     const bchSatoshis = bch * 100000000
     const total = bchSatoshis + 250 // Add 250 satoshis to cover TX fee.
 
-    // Loop through all the UTXOs.
+    // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+
+    // Loop through each address.
     for (var i = 0; i < utxos.length; i++) {
-      const thisUTXO = utxos[i]
+      const thisAddr = utxos[i]
 
-      // Ensure the Blockbook UTXO has a satoshis property.
-      if (thisUTXO.value && !thisUTXO.satoshis) { thisUTXO.satoshis = Number(thisUTXO.value) }
+      // Loop through each UTXO for each address.
+      for (let j = 0; j < thisAddr.utxos.length; j++) {
+        const thisUTXO = thisAddr.utxos[j]
 
-      // The UTXO must be greater than or equal to the send amount.
-      if (thisUTXO.satoshis >= total) {
-        // console.log(`thisUtxo: ${JSON.stringify(thisUTXO, null, 2)}`)
-
-        // Skip if the UTXO is invalid
-        const isValid = await this.appUtils.isValidUtxo(thisUTXO)
-        if (!isValid) {
-          console.log(
-            'warning: invalid UTXO found. You may need to wait for the indexer to catch up.'
-          )
-          continue
+        // Ensure the Electrumx or Blockbook UTXO has a satoshis property.
+        if (thisUTXO.value && !thisUTXO.satoshis) {
+          thisUTXO.satoshis = Number(thisUTXO.value)
         }
-        // console.log(`isValid: `, isValid)
 
-        // Skip if change would less than the dust amount.
-        if (thisUTXO.satoshis - bchSatoshis < 546) continue
+        // The UTXO must be greater than or equal to the send amount.
+        if (thisUTXO.satoshis >= total) {
+          // console.log(`thisUtxo: ${JSON.stringify(thisUTXO, null, 2)}`)
 
-        // Automatically assign if the candidateUTXO is an empty object.
-        if (!candidateUTXO.satoshis) {
-          candidateUTXO = thisUTXO
-          continue
+          // Skip if the UTXO is invalid
+          const isValid = await this.appUtils.isValidUtxo(thisUTXO)
+          if (!isValid) {
+            console.log(
+              'warning: invalid UTXO found. You may need to wait for the indexer to catch up.'
+            )
+            continue
+          }
+          // console.log(`isValid: `, isValid)
 
-          // Replace the candidate if the current UTXO is closer to the send amount.
-        } else if (candidateUTXO.satoshis > thisUTXO.satoshis) {
-          candidateUTXO = thisUTXO
+          // Skip if change would less than the dust amount.
+          if (thisUTXO.satoshis - bchSatoshis < 546) continue
+
+          // Automatically assign if the candidateUTXO is an empty object.
+          if (!candidateUTXO.satoshis) {
+            candidateUTXO = thisUTXO
+            continue
+
+            // Replace the candidate if the current UTXO is closer to the send amount.
+          } else if (candidateUTXO.satoshis > thisUTXO.satoshis) {
+            candidateUTXO = thisUTXO
+          }
         }
       }
     }
 
-    if (candidateUTXO.satoshis) { candidateUTXO.amount = candidateUTXO.satoshis / 100000000 }
+    if (candidateUTXO.satoshis) {
+      candidateUTXO.amount = candidateUTXO.satoshis / 100000000
+    }
 
     return candidateUTXO
   }
@@ -252,13 +266,19 @@ class Send extends Command {
   validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
-    if (!name || name === '') { throw new Error('You must specify a wallet with the -n flag.') }
+    if (!name || name === '') {
+      throw new Error('You must specify a wallet with the -n flag.')
+    }
 
     const bch = flags.bch
-    if (isNaN(Number(bch))) { throw new Error('You must specify a quantity in BCH with the -b flag.') }
+    if (isNaN(Number(bch))) {
+      throw new Error('You must specify a quantity in BCH with the -b flag.')
+    }
 
     const sendAddr = flags.sendAddr
-    if (!sendAddr || sendAddr === '') { throw new Error('You must specify a send-to address with the -a flag.') }
+    if (!sendAddr || sendAddr === '') {
+      throw new Error('You must specify a send-to address with the -a flag.')
+    }
 
     return true
   }

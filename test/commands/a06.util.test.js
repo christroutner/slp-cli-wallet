@@ -31,33 +31,33 @@ describe('#util.js', () => {
     sandbox.restore()
   })
 
-  describe('#getUTXOs', () => {
-    it('should get all UTXOs in wallet', async () => {
-      // Unit test mocking.
-      if (process.env.TEST === 'unit') {
-        sandbox
-          .stub(appUtils.BITBOX.Blockbook, 'utxo')
-          .resolves(utilMocks.mockSpentUtxo)
-      }
-
-      const utxos = await appUtils.getUTXOs(utilMocks.mainnetWallet)
-      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
-
-      assert.isArray(utxos, 'Expect array of utxos')
-      if (utxos.length > 0) {
-        assert.property(utxos[0], 'txid')
-        assert.property(utxos[0], 'vout')
-        assert.property(utxos[0], 'satoshis')
-        assert.property(utxos[0], 'height')
-        assert.property(utxos[0], 'confirmations')
-        assert.property(utxos[0], 'hdIndex')
-        assert.property(utxos[0], 'value')
-        assert.property(utxos[0], 'cashAddr')
-        assert.property(utxos[0], 'legacyAddr')
-        assert.property(utxos[0], 'slpAddr')
-      }
-    })
-  })
+  // describe('#getUTXOs', () => {
+  //   it('should get all UTXOs in wallet', async () => {
+  //     // Unit test mocking.
+  //     if (process.env.TEST === 'unit') {
+  //       sandbox
+  //         .stub(appUtils.BITBOX.Blockbook, 'utxo')
+  //         .resolves(utilMocks.mockSpentUtxo)
+  //     }
+  //
+  //     const utxos = await appUtils.getUTXOs(utilMocks.mainnetWallet)
+  //     // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+  //
+  //     assert.isArray(utxos, 'Expect array of utxos')
+  //     if (utxos.length > 0) {
+  //       assert.property(utxos[0], 'txid')
+  //       assert.property(utxos[0], 'vout')
+  //       assert.property(utxos[0], 'satoshis')
+  //       assert.property(utxos[0], 'height')
+  //       assert.property(utxos[0], 'confirmations')
+  //       assert.property(utxos[0], 'hdIndex')
+  //       assert.property(utxos[0], 'value')
+  //       assert.property(utxos[0], 'cashAddr')
+  //       assert.property(utxos[0], 'legacyAddr')
+  //       assert.property(utxos[0], 'slpAddr')
+  //     }
+  //   })
+  // })
 
   describe('#openWallet', () => {
     it('should throw error if wallet file not found.', () => {

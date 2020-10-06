@@ -1,7 +1,7 @@
 # This is a node.js v8+ JavaScript project
 language: node_js
 node_js:
-  - "10"
+  - "12"
 
 # Build on Ubuntu Xenial (16.04)
 # https://docs.travis-ci.com/user/reference/trusty/#javascript-and-nodejs-images

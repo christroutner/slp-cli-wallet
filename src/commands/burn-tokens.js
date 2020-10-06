@@ -109,7 +109,8 @@ class BurnTokens extends Command {
 
       // Get a list of BCH UTXOs in this wallet that can be used to pay for
       // the transaction fee.
-      const utxos = await this.sendTokens.getBchUtxos(walletInfo)
+      // const utxos = await this.sendTokens.getBchUtxos(walletInfo)
+      const utxos = walletInfo.BCHUtxos
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Instatiate the Send class so this function can reuse its selectUTXO() code.
