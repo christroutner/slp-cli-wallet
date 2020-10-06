@@ -10,7 +10,7 @@ const sinon = require('sinon')
 
 // Library under test.
 const SendTokens = require('../../src/commands/send-tokens')
-const config = require('../../config')
+// const config = require('../../config')
 
 // Mock data
 const testwallet = require('../mocks/token-wallet.json')
@@ -224,67 +224,69 @@ describe('#send-tokens', () => {
   //   })
   // }
 
-  describe('#sendTokens', () => {
-    it('should send SLP on testnet', async () => {
-      // Do not use the mocked version of bch-js for these tests.
-      sendTokens.BITBOX = new config.BCHLIB({
-        restURL: config.MAINNET_REST,
-        apiToken: config.JWT
-      })
-
-      const qty = 1.5 // tokens to send in an integration test.
-      const utxo =
-      // {
-      //   txid:
-      //     '26564508facb32a5f6893cb7bdfd2dcc264b248a1aa7dd0a572117667418ae5b',
-      //   vout: 0,
-      //   scriptPubKey: '76a9148687a941392d82bf0af208779c3b147e2fbadafa88ac',
-      //   amount: 0.03,
-      //   satoshis: 3000000,
-      //   height: 1265272,
-      //   confirmations: 733,
-      //   legacyAddress: 'mjSPWfCwCgHZC27nS8GQ4AXz9ehhb2GFqz',
-      //   cashAddress: 'bchtest:qq4sx72yfuhqryzm9h23zez27n6n24hdavvfqn2ma3',
-      //   hdIndex: 0
-      // }
-
-        {
-          address: 'bchtest:qq4sx72yfuhqryzm9h23zez27n6n24hdavvfqn2ma3',
-          utxos: [
-            [
-              {
-                height: 655296,
-                tx_hash:
-                  '60e3e96f1cad2cdad7be32c15b3ce5affb1c828a4a4110360f4d3e274815e5ea',
-                tx_pos: 239,
-                value: 547,
-                satoshis: 547,
-                txid:
-                  '60e3e96f1cad2cdad7be32c15b3ce5affb1c828a4a4110360f4d3e274815e5ea',
-                vout: 239,
-                isValid: false,
-                address: 'bchtest:qq4sx72yfuhqryzm9h23zez27n6n24hdavvfqn2ma3',
-                hdIndex: 2
-              }
-            ]
-          ]
-        }
-      const sendToAddr = 'bchtest:qzsfqeqtdk6plsvglccadkqtf0trf2nyz58090e6tt'
-
-      mockedWallet.network = 'testnet'
-
-      const hex = await sendTokens.sendTokens(
-        utxo,
-        qty,
-        utxo.cashAddress,
-        sendToAddr,
-        mockedWallet,
-        mockedWallet.SLPUtxos
-      )
-
-      // console.log(`hex: ${hex}`)
-
-      assert.isString(hex)
-    })
-  })
+  // 10/6/2020 CT: Not supporting testnet SLP tokens for now. Need to set up
+  // slp-api validation for testnet first.
+  // describe('#sendTokens', () => {
+  //   it('should send SLP on testnet', async () => {
+  //     // Do not use the mocked version of bch-js for these tests.
+  //     sendTokens.BITBOX = new config.BCHLIB({
+  //       restURL: config.MAINNET_REST,
+  //       apiToken: config.JWT
+  //     })
+  //
+  //     const qty = 1.5 // tokens to send in an integration test.
+  //     const utxo =
+  //     // {
+  //     //   txid:
+  //     //     '26564508facb32a5f6893cb7bdfd2dcc264b248a1aa7dd0a572117667418ae5b',
+  //     //   vout: 0,
+  //     //   scriptPubKey: '76a9148687a941392d82bf0af208779c3b147e2fbadafa88ac',
+  //     //   amount: 0.03,
+  //     //   satoshis: 3000000,
+  //     //   height: 1265272,
+  //     //   confirmations: 733,
+  //     //   legacyAddress: 'mjSPWfCwCgHZC27nS8GQ4AXz9ehhb2GFqz',
+  //     //   cashAddress: 'bchtest:qq4sx72yfuhqryzm9h23zez27n6n24hdavvfqn2ma3',
+  //     //   hdIndex: 0
+  //     // }
+  //
+  //       {
+  //         address: 'bchtest:qq4sx72yfuhqryzm9h23zez27n6n24hdavvfqn2ma3',
+  //         utxos: [
+  //           [
+  //             {
+  //               height: 655296,
+  //               tx_hash:
+  //                 '60e3e96f1cad2cdad7be32c15b3ce5affb1c828a4a4110360f4d3e274815e5ea',
+  //               tx_pos: 239,
+  //               value: 547,
+  //               satoshis: 547,
+  //               txid:
+  //                 '60e3e96f1cad2cdad7be32c15b3ce5affb1c828a4a4110360f4d3e274815e5ea',
+  //               vout: 239,
+  //               isValid: false,
+  //               address: 'bchtest:qq4sx72yfuhqryzm9h23zez27n6n24hdavvfqn2ma3',
+  //               hdIndex: 2
+  //             }
+  //           ]
+  //         ]
+  //       }
+  //     const sendToAddr = 'bchtest:qzsfqeqtdk6plsvglccadkqtf0trf2nyz58090e6tt'
+  //
+  //     mockedWallet.network = 'testnet'
+  //
+  //     const hex = await sendTokens.sendTokens(
+  //       utxo,
+  //       qty,
+  //       utxo.cashAddress,
+  //       sendToAddr,
+  //       mockedWallet,
+  //       mockedWallet.SLPUtxos
+  //     )
+  //
+  //     // console.log(`hex: ${hex}`)
+  //
+  //     assert.isString(hex)
+  //   })
+  // })
 })

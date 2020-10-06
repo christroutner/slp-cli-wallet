@@ -22,6 +22,8 @@ creation of this project in the [docs directory](./docs)
 
 [![Build Status](https://travis-ci.org/christroutner/bch-cli-wallet.svg?branch=master)](https://travis-ci.org/christroutner/bch-cli-wallet) [![Coverage Status](https://coveralls.io/repos/github/christroutner/bch-cli-wallet/badge.svg?branch=master)](https://coveralls.io/github/christroutner/bch-cli-wallet?branch=master) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![Greenkeeper badge](https://badges.greenkeeper.io/christroutner/bch-cli-wallet.svg)](https://greenkeeper.io/)
 
+**WARNING**: This wallet does not currently support testnet SLP tokens. It will ignore them.
+
 <!-- toc -->
 * [slp-cli-wallet](#slp-cli-wallet)
 * [NPM Usage](#npm-usage)

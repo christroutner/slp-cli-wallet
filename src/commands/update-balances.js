@@ -385,6 +385,7 @@ class UpdateBalances extends Command {
 
       // Hydrate UTXO data with SLP info.
       const hydratedUtxos = await this.bchjs.SLP.Utils.hydrateUtxos(utxos.utxos)
+      console.log(`hydratedUtxos: ${JSON.stringify(hydratedUtxos, null, 2)}`)
 
       // Add the hdIndex and address to each UTXO.
       // Loop through each address.
@@ -448,6 +449,7 @@ class UpdateBalances extends Command {
           let thisUtxo = thisUtxoObj.utxos[j]
 
           // Hydrate the UTXO using slp-api if SLPDB returns null.
+          // WARNING: This does not support testnet.
           if (thisUtxo.isValid === null) {
             console.warn(
               `Warning: Unvalidated UTXO detected: ${thisUtxo.tx_hash}`
