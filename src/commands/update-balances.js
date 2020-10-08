@@ -618,6 +618,9 @@ class UpdateBalances extends Command {
         const thisAddr = addressData[i]
         // console.log(`thisAddr: ${JSON.stringify(thisAddr, null, 2)}`)
 
+        // Handle corner-case.
+        if (!thisAddr) break
+
         const hdIndex = thisAddr.hdIndex
 
         // If the addresses array does not have the current address, add it.
@@ -713,7 +716,7 @@ class UpdateBalances extends Command {
 
       return details[0]
     } catch (err) {
-      console.error('Error in bckupValidate()')
+      console.error('Error in bkupValidate()')
       throw err
     }
   }
