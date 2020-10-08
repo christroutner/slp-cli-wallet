@@ -618,6 +618,9 @@ class UpdateBalances extends Command {
         const thisAddr = addressData[i]
         // console.log(`thisAddr: ${JSON.stringify(thisAddr, null, 2)}`)
 
+        // Handle corner-case.
+        if (!thisAddr) break
+
         const hdIndex = thisAddr.hdIndex
 
         // If the addresses array does not have the current address, add it.
