@@ -454,6 +454,7 @@ class UpdateBalances extends Command {
             console.warn(
               `Warning: Unvalidated UTXO detected: ${thisUtxo.tx_hash}`
             )
+            // console.log(`thisUtxo: ${JSON.stringify(thisUtxo, null, 2)}`)
             thisUtxo = await this.bkupValidate(thisUtxo)
           }
 
