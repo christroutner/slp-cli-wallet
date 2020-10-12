@@ -78,8 +78,13 @@ class SendAll extends Command {
       walletInfo = await updateBalances.updateBalances(flags)
 
       // Get all UTXOs controlled by this wallet.
-      // const utxos = await appUtils.getUTXOs(walletInfo)
-      const utxos = await walletInfo.BCHUtxos
+      let utxos = walletInfo.BCHUtxos
+
+      // Burn tokens if the -i flag is used.
+      if (flags.ignoreTokens) {
+        utxos = walletInfo.BCHUtxos.concat(walletInfo.SLPUtxos)
+      }
+
       // console.log(`utxos: ${util.inspect(utxos)}`)
 
       // Send the BCH, transfer change to the new address
