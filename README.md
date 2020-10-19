@@ -73,7 +73,7 @@ $ npm install -g slp-cli-wallet
 $ slp-cli-wallet COMMAND
 running command...
 $ slp-cli-wallet (-v|--version|version)
-slp-cli-wallet/1.5.0 linux-x64 node-v10.19.0
+slp-cli-wallet/2.0.1 linux-x64 node-v12.18.4
 $ slp-cli-wallet --help [COMMAND]
 USAGE
   $ slp-cli-wallet COMMAND
@@ -91,6 +91,7 @@ USAGE
 * [`slp-cli-wallet help [COMMAND]`](#slp-cli-wallet-help-command)
 * [`slp-cli-wallet list-wallets`](#slp-cli-wallet-list-wallets)
 * [`slp-cli-wallet remove-wallet`](#slp-cli-wallet-remove-wallet)
+* [`slp-cli-wallet scan-funds`](#slp-cli-wallet-scan-funds)
 * [`slp-cli-wallet send`](#slp-cli-wallet-send)
 * [`slp-cli-wallet send-all`](#slp-cli-wallet-send-all)
 * [`slp-cli-wallet send-tokens`](#slp-cli-wallet-send-tokens)
@@ -112,7 +113,7 @@ OPTIONS
   -t, --tokenId=tokenId  Token ID
 ```
 
-_See code: [src/commands/burn-tokens.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/burn-tokens.js)_
+_See code: [src/commands/burn-tokens.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/burn-tokens.js)_
 
 ## `slp-cli-wallet create-wallet`
 
@@ -127,7 +128,7 @@ OPTIONS
   -t, --testnet    Create a testnet wallet
 ```
 
-_See code: [src/commands/create-wallet.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/create-wallet.js)_
+_See code: [src/commands/create-wallet.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/create-wallet.js)_
 
 ## `slp-cli-wallet derivation`
 
@@ -153,7 +154,7 @@ DESCRIPTION
   Wallets use the 245 derivation path by default.
 ```
 
-_See code: [src/commands/derivation.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/derivation.js)_
+_See code: [src/commands/derivation.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/derivation.js)_
 
 ## `slp-cli-wallet get-address`
 
@@ -168,7 +169,7 @@ OPTIONS
   -t, --token      Generate a simpledger: token address
 ```
 
-_See code: [src/commands/get-address.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/get-address.js)_
+_See code: [src/commands/get-address.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/get-address.js)_
 
 ## `slp-cli-wallet get-key`
 
@@ -182,7 +183,7 @@ OPTIONS
   -n, --name=name  Name of wallet
 ```
 
-_See code: [src/commands/get-key.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/get-key.js)_
+_See code: [src/commands/get-key.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/get-key.js)_
 
 ## `slp-cli-wallet hello`
 
@@ -200,7 +201,7 @@ DESCRIPTION
   Leaving it here for future reference in development.
 ```
 
-_See code: [src/commands/hello.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/hello.js)_
 
 ## `slp-cli-wallet help [COMMAND]`
 
@@ -217,7 +218,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.1/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
 
 ## `slp-cli-wallet list-wallets`
 
@@ -228,7 +229,7 @@ USAGE
   $ slp-cli-wallet list-wallets
 ```
 
-_See code: [src/commands/list-wallets.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/list-wallets.js)_
+_See code: [src/commands/list-wallets.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/list-wallets.js)_
 
 ## `slp-cli-wallet remove-wallet`
 
@@ -242,7 +243,31 @@ OPTIONS
   -n, --name=name  Name of wallet
 ```
 
-_See code: [src/commands/remove-wallet.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/remove-wallet.js)_
+_See code: [src/commands/remove-wallet.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/remove-wallet.js)_
+
+## `slp-cli-wallet scan-funds`
+
+Scans first 20 addresses of each derivation path for
+
+```
+USAGE
+  $ slp-cli-wallet scan-funds
+
+OPTIONS
+  -m, --mnemonic=mnemonic  mnemonic phrase to generate addresses, wrapped in quotes
+
+DESCRIPTION
+  history and balance of the given mnemonic. If any of them had a history, scans
+  the next 20, until it reaches a batch of 20 addresses with no history. The -m
+  flag is used to pass it a mnemonic phrase.
+
+  Derivation pathes used:
+  145 - BIP44 standard path for Bitcoin Cash
+  245 - BIP44 standard path for SLP tokens
+  0 - Used by common software like the Bitcoin.com wallet and Honest.cash
+```
+
+_See code: [src/commands/scan-funds.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/scan-funds.js)_
 
 ## `slp-cli-wallet send`
 
@@ -258,7 +283,7 @@ OPTIONS
   -n, --name=name          Name of wallet
 ```
 
-_See code: [src/commands/send.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/send.js)_
+_See code: [src/commands/send.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/send.js)_
 
 ## `slp-cli-wallet send-all`
 
@@ -282,7 +307,7 @@ DESCRIPTION
   https://bit.ly/2TnhdVc
 ```
 
-_See code: [src/commands/send-all.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/send-all.js)_
+_See code: [src/commands/send-all.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/send-all.js)_
 
 ## `slp-cli-wallet send-tokens`
 
@@ -299,7 +324,7 @@ OPTIONS
   -t, --tokenId=tokenId    Token ID
 ```
 
-_See code: [src/commands/send-tokens.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/send-tokens.js)_
+_See code: [src/commands/send-tokens.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/send-tokens.js)_
 
 ## `slp-cli-wallet sign-message`
 
@@ -310,12 +335,12 @@ USAGE
   $ slp-cli-wallet sign-message
 
 OPTIONS
-  -i, --sendAddrIndex=sendAddrIndex    Adress index
+  -i, --sendAddrIndex=sendAddrIndex    Address index
   -n, --name=name                      Name of wallet
   -s, --signTheMessage=signTheMessage  Sign message
 ```
 
-_See code: [src/commands/sign-message.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/sign-message.js)_
+_See code: [src/commands/sign-message.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/sign-message.js)_
 
 ## `slp-cli-wallet sweep`
 
@@ -338,7 +363,7 @@ DESCRIPTION
   an error if a WIF contains more than one class of token.
 ```
 
-_See code: [src/commands/sweep.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/sweep.js)_
+_See code: [src/commands/sweep.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/sweep.js)_
 
 ## `slp-cli-wallet update-balances`
 
@@ -353,5 +378,5 @@ OPTIONS
   -n, --name=name     Name of wallet
 ```
 
-_See code: [src/commands/update-balances.js](https://github.com/christroutner/bch-cli-wallet/blob/v1.5.0/src/commands/update-balances.js)_
+_See code: [src/commands/update-balances.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/update-balances.js)_
 <!-- commandsstop -->
