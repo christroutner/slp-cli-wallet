@@ -433,6 +433,7 @@ class UpdateBalances extends Command {
         // Loop through the UTXOs in each object.
         for (let j = 0; j < thisUtxoObj.utxos.length; j++) {
           let thisUtxo = thisUtxoObj.utxos[j]
+          // console.log(`utxo: ${JSON.stringify(thisUtxo, null, 2)}`)
 
           // Hydrate the UTXO using slp-api if SLPDB returns null.
           // WARNING: This does not support testnet.
@@ -442,6 +443,19 @@ class UpdateBalances extends Command {
             )
             // console.log(`thisUtxo: ${JSON.stringify(thisUtxo, null, 2)}`)
             thisUtxo = await this.bkupValidate(thisUtxo)
+          }
+
+          if (thisUtxo.isValid === false && thisUtxo.tokenTicker) {
+            console.warn('Warning: hydrated UTXO is showing as invalid?!')
+            console.log(`thisUtxo: ${JSON.stringify(thisUtxo, null, 2)}`)
+
+            console.log(
+              `isValid before using bckupValidate: ${thisUtxo.isValid}`
+            )
+            thisUtxo = await this.bkupValidate(thisUtxo)
+            console.log(
+              `isValid after using bckupValidate: ${thisUtxo.isValid}`
+            )
           }
 
           // Add if this is an SLP UTXO.
