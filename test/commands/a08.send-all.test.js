@@ -151,7 +151,7 @@ describe('Send All', () => {
     it('should send BCH on mainnet', async () => {
       const utxos = mockUtxos.twoUtxos
 
-      const sendToAddr = 'bchtest:qzsfqeqtdk6plsvglccadkqtf0trf2nyz58090e6tt'
+      const sendToAddr = 'bitcoincash:qryxufkckgdfe3cfykydez4fjjsk4p2c5usevl9lfa'
 
       // Switch to mainnet
       mockedWallet.network = 'mainnet'
