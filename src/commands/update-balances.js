@@ -107,13 +107,20 @@ class UpdateBalances extends Command {
       walletInfo,
       flags.ignoreTokens
     )
-    // console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
+    console.log(`addressData: ${JSON.stringify(addressData, null, 2)}`)
 
     // Exit if this is a new wallet that does not need to be updated.
     if (addressData.addressData.length === 0) {
-      return {
-        balance: 0
-      }
+      walletInfo.balance = 0
+      walletInfo.balanceConfirmed = 0
+      walletInfo.balanceUnconfirmed = 0
+      walletInfo.hasBalance = []
+      walletInfo.SLPUtxos = []
+      walletInfo.BCHUtxos = []
+
+      await this.appUtils.saveWallet(filename, walletInfo)
+
+      return walletInfo
     }
 
     // Update hasBalance array with non-zero balances.
