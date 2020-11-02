@@ -92,6 +92,7 @@ class SendAll extends Command {
 
       // Send the BCH, transfer change to the new address
       const hex = await this.sendAllBCH(utxos, sendToAddr, walletInfo)
+      // console.log('hex: ', hex)
 
       const txid = await appUtils.broadcastTx(hex)
 

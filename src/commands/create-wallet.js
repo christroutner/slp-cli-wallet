@@ -43,7 +43,9 @@ class CreateWallet extends Command {
 
       const filename = `${__dirname}/../../wallets/${flags.name}.json`
 
-      this.createWallet(filename, flags.testnet)
+      if (!flags.description) flags.description = ''
+
+      this.createWallet(filename, flags.testnet, flags.description)
     } catch (err) {
       if (err.message) console.log(err.message)
       else console.log('Error in create-wallet.js/run(): ', err)
@@ -53,7 +55,7 @@ class CreateWallet extends Command {
   }
 
   // testnet is a boolean.
-  async createWallet (filename, testnet) {
+  async createWallet (filename, testnet, desc) {
     try {
       if (!filename || filename === '') throw new Error('filename required.')
       if (fs.existsSync(filename)) throw new Error('filename already exist')
@@ -99,6 +101,7 @@ class CreateWallet extends Command {
       walletData.nextAddress = 1
       walletData.hasBalance = []
       walletData.addresses = []
+      walletData.description = desc
 
       // Write out the basic information into a json file for other apps to use.
       // const filename = `${__dirname}/../../wallets/${name}.json`
@@ -125,7 +128,8 @@ CreateWallet.description = 'Generate a new HD Wallet.'
 
 CreateWallet.flags = {
   testnet: flags.boolean({ char: 't', description: 'Create a testnet wallet' }),
-  name: flags.string({ char: 'n', description: 'Name of wallet' })
+  name: flags.string({ char: 'n', description: 'Name of wallet' }),
+  description: flags.string({ char: 'd', description: 'Description of the wallet' })
 }
 
 module.exports = CreateWallet

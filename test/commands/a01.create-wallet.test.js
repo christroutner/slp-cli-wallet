@@ -61,7 +61,8 @@ describe('create-wallet', () => {
       'hasBalance',
       'rootAddress',
       'derivation',
-      'addresses'
+      'addresses',
+      'description'
     ])
 
     // hasBalance is an array of objects. Each object represents an address with
@@ -87,7 +88,8 @@ describe('create-wallet', () => {
       'hasBalance',
       'rootAddress',
       'derivation',
-      'addresses'
+      'addresses',
+      'description'
     ])
 
     // hasBalance is an array of objects. Each object represents an address with
@@ -113,7 +115,8 @@ describe('create-wallet', () => {
       'hasBalance',
       'rootAddress',
       'derivation',
-      'addresses'
+      'addresses',
+      'description'
     ])
 
     // hasBalance is an array of objects. Each object represents an address with
