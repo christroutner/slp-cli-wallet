@@ -73,7 +73,7 @@ $ npm install -g slp-cli-wallet
 $ slp-cli-wallet COMMAND
 running command...
 $ slp-cli-wallet (-v|--version|version)
-slp-cli-wallet/2.0.1 linux-x64 node-v12.18.4
+slp-cli-wallet/2.0.1 linux-x64 node-v14.14.0
 $ slp-cli-wallet --help [COMMAND]
 USAGE
   $ slp-cli-wallet COMMAND
@@ -124,8 +124,9 @@ USAGE
   $ slp-cli-wallet create-wallet
 
 OPTIONS
-  -n, --name=name  Name of wallet
-  -t, --testnet    Create a testnet wallet
+  -d, --description=description  Description of the wallet
+  -n, --name=name                Name of wallet
+  -t, --testnet                  Create a testnet wallet
 ```
 
 _See code: [src/commands/create-wallet.js](https://github.com/christroutner/slp-cli-wallet/blob/v2.0.1/src/commands/create-wallet.js)_

@@ -32,7 +32,7 @@ const AppUtils = require('../util')
 const appUtils = new AppUtils()
 
 // Mainnet by default
-const BITBOX = new config.BCHLIB({
+const bchjs = new config.BCHLIB({
   restURL: config.MAINNET_REST,
   apiToken: config.JWT
 })
@@ -48,7 +48,7 @@ class SendAll extends Command {
     super(argv, config)
     // _this = this
 
-    this.BITBOX = BITBOX
+    this.bchjs = bchjs
   }
 
   async run () {
@@ -68,13 +68,15 @@ class SendAll extends Command {
 
       // Determine if this is a testnet wallet or a mainnet wallet.
       if (walletInfo.network === 'testnet') {
-        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
-        appUtils.BITBOX = this.BITBOX
+        this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
+        appUtils.bchjs = this.bchjs
       }
+
+      // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
       // Update balances before sending.
       const updateBalances = new UpdateBalances()
-      updateBalances.BITBOX = this.BITBOX
+      updateBalances.bchjs = this.bchjs
       walletInfo = await updateBalances.updateBalances(flags)
 
       // Get all UTXOs controlled by this wallet.
@@ -82,6 +84,7 @@ class SendAll extends Command {
 
       // Burn tokens if the -i flag is used.
       if (flags.ignoreTokens) {
+        // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
         utxos = walletInfo.BCHUtxos.concat(walletInfo.SLPUtxos)
       }
 
@@ -89,6 +92,7 @@ class SendAll extends Command {
 
       // Send the BCH, transfer change to the new address
       const hex = await this.sendAllBCH(utxos, sendToAddr, walletInfo)
+      // console.log('hex: ', hex)
 
       const txid = await appUtils.broadcastTx(hex)
 
@@ -118,8 +122,8 @@ class SendAll extends Command {
       // instance of transaction builder
       let transactionBuilder
       if (walletInfo.network === 'testnet') {
-        transactionBuilder = new this.BITBOX.TransactionBuilder('testnet')
-      } else transactionBuilder = new this.BITBOX.TransactionBuilder()
+        transactionBuilder = new this.bchjs.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.bchjs.TransactionBuilder()
 
       let originalAmount = 0
       let numUtxos = 0
@@ -150,7 +154,7 @@ class SendAll extends Command {
       // console.log(`originalAmount: ${originalAmount}`)
 
       // get byte count to calculate fee. paying 1 sat/byte
-      const byteCount = this.BITBOX.BitcoinCash.getByteCount(
+      const byteCount = this.bchjs.BitcoinCash.getByteCount(
         { P2PKH: numUtxos },
         { P2PKH: 1 }
       )
@@ -163,7 +167,7 @@ class SendAll extends Command {
 
       // add output w/ address and amount to send
       transactionBuilder.addOutput(
-        this.BITBOX.Address.toLegacyAddress(sendToAddr),
+        this.bchjs.Address.toLegacyAddress(sendToAddr),
         sendAmount
       )
 
@@ -185,7 +189,7 @@ class SendAll extends Command {
             walletInfo,
             utxo.hdIndex
           )
-          const keyPair = this.BITBOX.HDNode.toKeyPair(change)
+          const keyPair = this.bchjs.HDNode.toKeyPair(change)
 
           transactionBuilder.sign(
             inputCnt,

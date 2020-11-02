@@ -178,12 +178,13 @@ class SendTokens extends Command {
       // //console.log(`byteCount: ${byteCount}`)
       // const satoshisPerByte = 1.1
       // const txFee = Math.floor(satoshisPerByte * byteCount)
-      // console.log(`txFee: ${txFee} satoshis\n`)
+
       const txFee = 500
+      // console.log(`txFee: ${txFee} satoshis\n`)
 
       // amount to send back to the sending address. It's the original amount - 1 sat/byte for tx size
       const remainder = originalAmount - txFee - 546 * 2
-      if (remainder < 1) {
+      if (remainder < 546) {
         throw new Error('Selected UTXO does not have enough satoshis')
       }
       // console.log(`remainder: ${remainder}`)
