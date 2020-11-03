@@ -33,17 +33,18 @@ const config = {}
 config.JWT = '' // default value
 if (process.env.BCHJSTOKEN) config.JWT = process.env.BCHJSTOKEN
 
-if (RESTAPI === 'wallet') {
-  config.BCHLIB = BCHJS.BitboxShim()
-  // config.MAINNET_REST = `https://api.bchjs.cash/v3/`
-  // config.TESTNET_REST = `https://tapi.bchjs.cash/v3/`
-  config.MAINNET_REST = 'https://wallet.bchjs.cash/v3/'
-  config.TESTNET_REST = 'https://twallet.bchjs.cash/v3/'
-  config.RESTAPI = 'wallet'
-}
+// if (RESTAPI === 'wallet') {
+//   config.BCHLIB = BCHJS.BitboxShim()
+//   // config.MAINNET_REST = `https://api.bchjs.cash/v3/`
+//   // config.TESTNET_REST = `https://tapi.bchjs.cash/v3/`
+//   config.MAINNET_REST = 'https://wallet.bchjs.cash/v3/'
+//   config.TESTNET_REST = 'https://twallet.bchjs.cash/v3/'
+//   config.RESTAPI = 'wallet'
+// }
 
 if (RESTAPI === 'fullstack.cash') {
-  config.BCHLIB = BCHJS.BitboxShim()
+  // config.BCHLIB = BCHJS.BitboxShim()
+  config.BCHLIB = BCHJS
   config.MAINNET_REST = 'https://api.fullstack.cash/v3/'
   config.TESTNET_REST = 'https://tapi.fullstack.cash/v3/'
   config.RESTAPI = 'bchjs'
@@ -58,12 +59,12 @@ if (RESTAPI === 'fullstack.cash') {
 // }
 
 // Use bch-js but use it with the bitcoin.com infrastructure.
-if (RESTAPI === 'rest.bitcoin.com') {
-  config.BCHLIB = BCHJS.BitboxShim()
-  config.MAINNET_REST = 'https://rest.bitcoin.com/v2/'
-  config.TESTNET_REST = 'http://157.245.141.224:3000/v2/'
-  config.RESTAPI = 'rest.bitcoin.com'
-}
+// if (RESTAPI === 'rest.bitcoin.com') {
+//   config.BCHLIB = BCHJS.BitboxShim()
+//   config.MAINNET_REST = 'https://rest.bitcoin.com/v2/'
+//   config.TESTNET_REST = 'http://157.245.141.224:3000/v2/'
+//   config.RESTAPI = 'rest.bitcoin.com'
+// }
 
 // Use bch-js with local infrastructure.
 if (RESTAPI === 'local') {

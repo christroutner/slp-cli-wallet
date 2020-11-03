@@ -25,7 +25,7 @@ const config = require('../../config')
 // const sendTokens = new SendTokens()
 
 // Mainnet by default.
-const BITBOX = new config.BCHLIB({
+const bchjs = new config.BCHLIB({
   restURL: config.MAINNET_REST,
   apiToken: config.JWT
 })
@@ -39,7 +39,7 @@ class Sweep extends Command {
     super(argv, config)
     // _this = this
 
-    this.BITBOX = BITBOX
+    this.bchjs = bchjs
   }
 
   async run () {
@@ -78,7 +78,7 @@ class Sweep extends Command {
       if (tokenUtxos.length === 0) hex = await this.sweepBCH(flags)
       else hex = await this.sweepTokens(flags, bchUtxos, tokenUtxos)
 
-      const txid = await this.BITBOX.RawTransactions.sendRawTransaction([hex])
+      const txid = await this.bchjs.RawTransactions.sendRawTransaction([hex])
       console.log(`txid: ${txid}`)
     } catch (err) {
       if (err.message) console.log(err.message)
@@ -97,7 +97,7 @@ class Sweep extends Command {
       }
 
       if (flags.testnet) {
-        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+        this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
       }
 
       // Ensure there is only one class of token in the wallet. Throw an error if
@@ -113,15 +113,15 @@ class Sweep extends Command {
       const wif = flags.wif
       const toAddr = flags.address
 
-      const ecPair = this.BITBOX.ECPair.fromWIF(wif)
+      const ecPair = this.bchjs.ECPair.fromWIF(wif)
 
-      // const fromAddr = this.BITBOX.ECPair.toCashAddress(ecPair)
+      // const fromAddr = this.bchjs.ECPair.toCashAddress(ecPair)
 
       // instance of transaction builder
       let transactionBuilder
       if (flags.testnet) {
-        transactionBuilder = new this.BITBOX.TransactionBuilder('testnet')
-      } else transactionBuilder = new this.BITBOX.TransactionBuilder()
+        transactionBuilder = new this.bchjs.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.bchjs.TransactionBuilder()
 
       // Combine all the UTXOs into a single array.
       const allUtxos = bchUtxos.concat(tokenUtxos)
@@ -145,7 +145,7 @@ class Sweep extends Command {
 
       // get byte count to calculate fee. paying 1 sat
       // Note: This may not be totally accurate. Just guessing on the byteCount size.
-      // const byteCount = this.BITBOX.BitcoinCash.getByteCount(
+      // const byteCount = this.bchjs.BitcoinCash.getByteCount(
       //   { P2PKH: 3 },
       //   { P2PKH: 5 }
       // )
@@ -178,7 +178,7 @@ class Sweep extends Command {
       const {
         script,
         outputs
-      } = this.BITBOX.SLP.TokenType1.generateSendOpReturn(tokenUtxos, tokenQty)
+      } = this.bchjs.SLP.TokenType1.generateSendOpReturn(tokenUtxos, tokenQty)
       // console.log(`token outputs: ${outputs}`)
 
       // Since we are sweeping all tokens from the WIF, there generateOpReturn()
@@ -191,18 +191,18 @@ class Sweep extends Command {
       }
 
       // Add OP_RETURN as first output.
-      const data = BITBOX.Script.encode(script)
+      const data = bchjs.Script.encode(script)
       transactionBuilder.addOutput(data, 0)
 
       // Send dust transaction representing tokens being sent.
       transactionBuilder.addOutput(
-        this.BITBOX.Address.toLegacyAddress(toAddr),
+        this.bchjs.Address.toLegacyAddress(toAddr),
         546
       )
 
       // Last output: send remaining BCH
       transactionBuilder.addOutput(
-        this.BITBOX.Address.toLegacyAddress(toAddr),
+        this.bchjs.Address.toLegacyAddress(toAddr),
         remainder
       )
       // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
@@ -241,18 +241,18 @@ class Sweep extends Command {
   async sweepBCH (flags) {
     try {
       if (flags.testnet) {
-        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+        this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
       }
 
       const wif = flags.wif
       const toAddr = flags.address
 
-      const ecPair = this.BITBOX.ECPair.fromWIF(wif)
+      const ecPair = this.bchjs.ECPair.fromWIF(wif)
 
-      const fromAddr = this.BITBOX.ECPair.toCashAddress(ecPair)
+      const fromAddr = this.bchjs.ECPair.toCashAddress(ecPair)
 
       // Get the UTXOs for that address.
-      let utxos = await this.BITBOX.Blockbook.utxo(fromAddr)
+      let utxos = await this.bchjs.Blockbook.utxo(fromAddr)
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       // Ensure all utxos have the satoshis property.
@@ -265,8 +265,8 @@ class Sweep extends Command {
       // instance of transaction builder
       let transactionBuilder
       if (flags.testnet) {
-        transactionBuilder = new this.BITBOX.TransactionBuilder('testnet')
-      } else transactionBuilder = new this.BITBOX.TransactionBuilder()
+        transactionBuilder = new this.bchjs.TransactionBuilder('testnet')
+      } else transactionBuilder = new this.bchjs.TransactionBuilder()
 
       let originalAmount = 0
 
@@ -286,7 +286,7 @@ class Sweep extends Command {
       }
 
       // get byte count to calculate fee. paying 1 sat/byte
-      const byteCount = this.BITBOX.BitcoinCash.getByteCount(
+      const byteCount = this.bchjs.BitcoinCash.getByteCount(
         { P2PKH: utxos.length },
         { P2PKH: 1 }
       )
@@ -297,7 +297,7 @@ class Sweep extends Command {
 
       // add output w/ address and amount to send
       transactionBuilder.addOutput(
-        this.BITBOX.Address.toLegacyAddress(toAddr),
+        this.bchjs.Address.toLegacyAddress(toAddr),
         sendAmount
       )
 
@@ -331,17 +331,17 @@ class Sweep extends Command {
   async getBalance (flags) {
     try {
       if (flags.testnet) {
-        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+        this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
       }
 
       const wif = flags.wif
 
-      const ecPair = this.BITBOX.ECPair.fromWIF(wif)
+      const ecPair = this.bchjs.ECPair.fromWIF(wif)
 
-      const fromAddr = this.BITBOX.ECPair.toCashAddress(ecPair)
+      const fromAddr = this.bchjs.ECPair.toCashAddress(ecPair)
 
       // get BCH balance for the public address.
-      const balances = await this.BITBOX.Blockbook.balance(fromAddr)
+      const balances = await this.bchjs.Blockbook.balance(fromAddr)
       // console.log(`balances: ${JSON.stringify(balances, null, 2)}`)
 
       return Number(balances.balance)
@@ -355,17 +355,17 @@ class Sweep extends Command {
   async getTokens (flags) {
     try {
       if (flags.testnet) {
-        this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+        this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
       }
 
       const wif = flags.wif
 
-      const ecPair = this.BITBOX.ECPair.fromWIF(wif)
+      const ecPair = this.bchjs.ECPair.fromWIF(wif)
 
-      const fromAddr = this.BITBOX.ECPair.toCashAddress(ecPair)
+      const fromAddr = this.bchjs.ECPair.toCashAddress(ecPair)
 
       // get BCH balance for the public address.
-      const utxos = await this.BITBOX.Blockbook.utxo(fromAddr)
+      const utxos = await this.bchjs.Blockbook.utxo(fromAddr)
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
       const tokenUtxos = []
@@ -375,7 +375,7 @@ class Sweep extends Command {
       if (utxos.length === 0) return { bchUtxos, tokenUtxos }
 
       // Figure out which UTXOs are associated with SLP tokens.
-      const isTokenUtxo = await this.BITBOX.Util.tokenUtxoDetails(utxos)
+      const isTokenUtxo = await this.bchjs.SLP.Utils.tokenUtxoDetails(utxos)
       // console.log(`isTokenUtxo: ${JSON.stringify(isTokenUtxo, null, 2)}`)
 
       // Separate the bch and token UTXOs.
