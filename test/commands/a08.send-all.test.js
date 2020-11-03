@@ -30,17 +30,17 @@ util.inspect.defaultOptions = {
 if (!process.env.TEST) process.env.TEST = 'unit'
 
 describe('Send All', () => {
-  let BITBOX
+  let bchjs
   let mockedWallet
   let sendAll
 
   beforeEach(() => {
     // By default, use the mocking library instead of live calls.
-    BITBOX = bitboxMock
+    bchjs = bitboxMock
     mockedWallet = Object.assign({}, testwallet) // Clone the testwallet
 
     sendAll = new SendAll()
-    sendAll.BITBOX = BITBOX
+    sendAll.bchjs = bchjs
   })
 
   describe('#validateFlags', () => {

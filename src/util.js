@@ -20,11 +20,11 @@ util.inspect.defaultOptions = {
 
 const config = require('../config')
 
-const BITBOX = new config.BCHLIB({ restURL: config.MAINNET_REST })
+const bchjs = new config.BCHLIB({ restURL: config.MAINNET_REST })
 
 class AppUtils {
   constructor () {
-    this.BITBOX = BITBOX
+    this.bchjs = bchjs
   }
 
   // Deprecated.
@@ -37,7 +37,7 @@ class AppUtils {
 
       // // Determine if this is a testnet wallet or a mainnet wallet.
       // if (walletInfo.network === 'testnet') {
-      //   this.BITBOX = new config.BCHLIB({ restURL: config.TESTNET_REST })
+      //   this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
       // }
       //
       // const retArray = []
@@ -47,11 +47,11 @@ class AppUtils {
       //   const thisAddr = walletInfo.hasBalance[i].cashAddress
       //
       //   // Get the UTXOs for that address.
-      //   // const u = await this.BITBOX.Address.utxo(thisAddr)
+      //   // const u = await this.bchjs.Address.utxo(thisAddr)
       //   // console.log(`u for ${thisAddr}: ${JSON.stringify(u, null, 2)}`)
       //
       //   // const utxos = u.utxos
-      //   const utxos = await this.BITBOX.Blockbook.utxo(thisAddr)
+      //   const utxos = await this.bchjs.Blockbook.utxo(thisAddr)
       //   // console.log(`utxos for ${thisAddr}: ${JSON.stringify(utxos, null, 2)}`)
       //
       //   // Loop through each UXTO returned
@@ -64,8 +64,8 @@ class AppUtils {
       //
       //     // Add the addresses.
       //     thisUTXO.cashAddr = thisAddr
-      //     thisUTXO.legacyAddr = this.BITBOX.Address.toLegacyAddress(thisAddr)
-      //     thisUTXO.slpAddr = this.BITBOX.SLP.Address.toSLPAddress(thisAddr)
+      //     thisUTXO.legacyAddr = this.bchjs.Address.toLegacyAddress(thisAddr)
+      //     thisUTXO.slpAddr = this.bchjs.SLP.Address.toSLPAddress(thisAddr)
       //
       //     // Only check against SLP UTXOs, if hte SLPUtxos array exists.
       //     if (walletInfo.SLPUtxos) {
@@ -145,24 +145,24 @@ class AppUtils {
       // root seed buffer
       let rootSeed
       if (config.RESTAPI === 'bitcoin.com') {
-        rootSeed = this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
-      } else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
+        rootSeed = this.bchjs.Mnemonic.toSeed(walletInfo.mnemonic)
+      } else rootSeed = await this.bchjs.Mnemonic.toSeed(walletInfo.mnemonic)
 
       // master HDNode
       let masterHDNode
       if (walletInfo.network === 'testnet') {
-        masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, 'testnet')
-      } else masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
+        masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed, 'testnet')
+      } else masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed)
 
       // HDNode of BIP44 account
       // console.log(`derivation path: m/44'/${walletInfo.derivation}'/0'`)
-      const account = this.BITBOX.HDNode.derivePath(
+      const account = this.bchjs.HDNode.derivePath(
         masterHDNode,
         `m/44'/${walletInfo.derivation}'/0'`
       )
 
       // derive the first external change address HDNode which is going to spend utxo
-      const change = this.BITBOX.HDNode.derivePath(account, `0/${index}`)
+      const change = this.bchjs.HDNode.derivePath(account, `0/${index}`)
 
       return change
     } catch (err) {
@@ -176,7 +176,7 @@ class AppUtils {
   // or throws an error.
   async broadcastTx (hex) {
     try {
-      const txid = await this.BITBOX.RawTransactions.sendRawTransaction([hex])
+      const txid = await this.bchjs.RawTransactions.sendRawTransaction([hex])
 
       return txid
     } catch (err) {
@@ -227,7 +227,7 @@ class AppUtils {
 
       // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
-      const txout = await this.BITBOX.Blockchain.getTxOut(utxo.txid, utxo.vout)
+      const txout = await this.bchjs.Blockchain.getTxOut(utxo.txid, utxo.vout)
       // console.log(`txout: ${JSON.stringify(txout, null, 2)}`)
 
       if (txout === null) return false
@@ -254,17 +254,17 @@ class AppUtils {
     // root seed buffer
     let rootSeed
     if (config.RESTAPI === 'bitcoin.com') {
-      rootSeed = this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
-    } else rootSeed = await this.BITBOX.Mnemonic.toSeed(walletInfo.mnemonic)
+      rootSeed = this.bchjs.Mnemonic.toSeed(walletInfo.mnemonic)
+    } else rootSeed = await this.bchjs.Mnemonic.toSeed(walletInfo.mnemonic)
 
     // master HDNode
     let masterHDNode
     if (walletInfo.network === 'testnet') {
-      masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed, 'testnet')
-    } else masterHDNode = this.BITBOX.HDNode.fromSeed(rootSeed)
+      masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed, 'testnet')
+    } else masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed)
 
     // HDNode of BIP44 account
-    const account = this.BITBOX.HDNode.derivePath(
+    const account = this.bchjs.HDNode.derivePath(
       masterHDNode,
       `m/44'/${walletInfo.derivation}'/0'`
     )
@@ -275,11 +275,11 @@ class AppUtils {
     // Generate the addresses.
     for (let i = index; i < index + limit; i++) {
       // derive an external change address HDNode
-      const change = this.BITBOX.HDNode.derivePath(account, `0/${i}`)
+      const change = this.bchjs.HDNode.derivePath(account, `0/${i}`)
 
       // get the cash address
-      const newAddress = this.BITBOX.HDNode.toCashAddress(change)
-      // const legacy = this.BITBOX.HDNode.toLegacyAddress(change)
+      const newAddress = this.bchjs.HDNode.toCashAddress(change)
+      // const legacy = this.bchjs.HDNode.toLegacyAddress(change)
 
       // push address into array
       bulkAddresses.push(newAddress)
