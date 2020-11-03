@@ -119,7 +119,7 @@ describe('#update-balances.js', () => {
           .resolves(updateBalancesMocks.mockTokenUtxo)
 
         sandbox
-          .stub(updateBalances.bchjs.Util, 'tokenUtxoDetails')
+          .stub(updateBalances.bchjs.SLP.Utils, 'tokenUtxoDetails')
           .resolves(updateBalancesMocks.mockTokenUtxoDetails)
       }
 
