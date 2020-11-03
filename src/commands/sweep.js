@@ -70,7 +70,11 @@ class Sweep extends Command {
       }
 
       // Exit if only the balance needed to be retrieved.
-      if (flags.balanceOnly || balance === 0) return
+      if (flags.balanceOnly) return
+      if (balance === 0) {
+        console.log('No BCH balance found on paper wallet, aborting sweep.')
+        return
+      }
 
       console.log('Sweeping...')
       let hex
