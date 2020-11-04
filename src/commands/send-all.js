@@ -49,6 +49,7 @@ class SendAll extends Command {
     // _this = this
 
     this.bchjs = bchjs
+    this.appUtils = appUtils
   }
 
   async run () {
