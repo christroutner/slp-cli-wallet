@@ -46,8 +46,15 @@ class UpdateBalances extends Command {
   constructor (argv, config) {
     super(argv, config)
 
+    // Default libraries.
     this.bchjs = bchjs
     this.appUtils = appUtils
+
+    // If bchjs is specified, override it with that.
+    if (config && config.bchjs) {
+      this.bchjs = config.bchjs
+      this.appUtils = new AppUtils({ bchjs: this.bchjs })
+    }
   }
 
   async run () {

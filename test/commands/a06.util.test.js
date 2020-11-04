@@ -36,7 +36,7 @@ describe('#util.js', () => {
   //     // Unit test mocking.
   //     if (process.env.TEST === 'unit') {
   //       sandbox
-  //         .stub(appUtils.BITBOX.Blockbook, 'utxo')
+  //         .stub(appUtils.bchjs.Blockbook, 'utxo')
   //         .resolves(utilMocks.mockSpentUtxo)
   //     }
   //
@@ -79,7 +79,7 @@ describe('#util.js', () => {
 
   describe('#changeAddrFromMnemonic', () => {
     it('should return a change address', async () => {
-      appUtils.BITBOX = new config.BCHLIB({
+      appUtils.bchjs = new config.BCHLIB({
         restURL: config.TESTNET_REST
       })
 
@@ -113,7 +113,7 @@ describe('#util.js', () => {
 
     it('should return false for a spent UTXO', async () => {
       // Unit test mocking.
-      if (process.env.TEST === 'unit') { sandbox.stub(appUtils.BITBOX.Blockchain, 'getTxOut').resolves(null) }
+      if (process.env.TEST === 'unit') { sandbox.stub(appUtils.bchjs.Blockchain, 'getTxOut').resolves(null) }
 
       const result = await appUtils.isValidUtxo(utilMocks.mockSpentUtxo[0])
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
@@ -125,7 +125,7 @@ describe('#util.js', () => {
       // Unit test mocking.
       if (process.env.TEST === 'unit') {
         sandbox
-          .stub(appUtils.BITBOX.Blockchain, 'getTxOut')
+          .stub(appUtils.bchjs.Blockchain, 'getTxOut')
           .resolves(utilMocks.mockTxOut)
       }
 
@@ -138,7 +138,7 @@ describe('#util.js', () => {
 
   describe('#generateAddresses', () => {
     it('should generate an address accurately.', async () => {
-      // updateBalances.BITBOX = new config.BCHLIB({
+      // updateBalances.bchjs = new config.BCHLIB({
       //   restURL: config.TESTNET_REST
       // })
 
@@ -154,7 +154,7 @@ describe('#util.js', () => {
     })
 
     it('should generate the first 20 addresses', async () => {
-      appUtils.BITBOX = new config.BCHLIB({
+      appUtils.bchjs = new config.BCHLIB({
         restURL: config.TESTNET_REST
       })
 

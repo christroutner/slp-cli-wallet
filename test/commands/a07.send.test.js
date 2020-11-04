@@ -30,20 +30,20 @@ util.inspect.defaultOptions = {
 if (!process.env.TEST) process.env.TEST = 'unit'
 
 describe('send', () => {
-  let BITBOX
+  let bchjs
   let mockedWallet
   let send
   let sandbox
 
   beforeEach(() => {
     // By default, use the mocking library instead of live calls.
-    BITBOX = bitboxMock
+    bchjs = bitboxMock
     mockedWallet = Object.assign({}, testwallet) // Clone the testwallet
 
     sandbox = sinon.createSandbox()
 
     send = new Send()
-    send.BITBOX = BITBOX
+    send.bchjs = bchjs
   })
 
   afterEach(() => {
@@ -115,7 +115,6 @@ describe('send', () => {
         sandbox.stub(send.appUtils, 'isValidUtxo').resolves(true)
 
         const bch = 0.00005
-        // const utxos = bitboxMock.Address.utxo()
         const utxos = mockData.mockSingleUtxos
         // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
@@ -144,7 +143,6 @@ describe('send', () => {
       }
 
       const bch = 0.000058
-      // const utxos = bitboxMock.Address.utxo()
       const utxos = mockData.mockUnspentUtxo
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
@@ -161,7 +159,6 @@ describe('send', () => {
       }
 
       const bch = 0.00005
-      // const utxos = bitboxMock.Address.utxo()
       const utxos = mockData.mockSpentUtxo
       // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
