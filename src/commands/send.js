@@ -57,11 +57,11 @@ class Send extends Command {
       // Determine if this is a testnet wallet or a mainnet wallet.
       if (walletInfo.network === 'testnet') {
         this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
-        this.appUtils.bchjs = this.bchjs
+        this.appUtils = new AppUtils({ bchjs: this.bchjs })
       }
 
       // Update balances before sending.
-      const updateBalances = new UpdateBalances()
+      const updateBalances = new UpdateBalances(undefined, { bchjs: this.bchjs })
       updateBalances.bchjs = this.bchjs
       walletInfo = await updateBalances.updateBalances(flags)
 

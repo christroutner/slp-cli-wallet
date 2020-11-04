@@ -69,14 +69,13 @@ class SendAll extends Command {
       // Determine if this is a testnet wallet or a mainnet wallet.
       if (walletInfo.network === 'testnet') {
         this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
-        appUtils.bchjs = this.bchjs
+        this.appUtils = new AppUtils({ bchjs: this.bchjs })
       }
 
       // console.log(`walletInfo: ${JSON.stringify(walletInfo, null, 2)}`)
 
       // Update balances before sending.
-      const updateBalances = new UpdateBalances()
-      updateBalances.bchjs = this.bchjs
+      const updateBalances = new UpdateBalances(undefined, { bchjs: this.bchjs })
       walletInfo = await updateBalances.updateBalances(flags)
 
       // Get all UTXOs controlled by this wallet.
@@ -94,7 +93,7 @@ class SendAll extends Command {
       const hex = await this.sendAllBCH(utxos, sendToAddr, walletInfo)
       // console.log('hex: ', hex)
 
-      const txid = await appUtils.broadcastTx(hex)
+      const txid = await this.appUtils.broadcastTx(hex)
 
       console.log(`TXID: ${txid}`)
 
@@ -185,7 +184,7 @@ class SendAll extends Command {
           // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
           // Generate a keypair for the current address.
-          const change = await appUtils.changeAddrFromMnemonic(
+          const change = await this.appUtils.changeAddrFromMnemonic(
             walletInfo,
             utxo.hdIndex
           )

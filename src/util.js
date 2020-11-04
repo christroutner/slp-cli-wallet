@@ -23,82 +23,13 @@ const config = require('../config')
 const bchjs = new config.BCHLIB({ restURL: config.MAINNET_REST })
 
 class AppUtils {
-  constructor () {
+  constructor (config) {
+    // By default use public npm library and mainnet.
     this.bchjs = bchjs
-  }
 
-  // Deprecated.
-  // Returns an array of UTXO objects. These objects contain the metadata needed
-  // to optimize the selection of a UTXO for spending.
-  // Will discard (not return) UTXOs that belong to SLP tokens.
-  async getUTXOs (walletInfo) {
-    try {
-      return walletInfo.BCHUtxos
-
-      // // Determine if this is a testnet wallet or a mainnet wallet.
-      // if (walletInfo.network === 'testnet') {
-      //   this.bchjs = new config.BCHLIB({ restURL: config.TESTNET_REST })
-      // }
-      //
-      // const retArray = []
-      //
-      // // Loop through each address that has a balance.
-      // for (var i = 0; i < walletInfo.hasBalance.length; i++) {
-      //   const thisAddr = walletInfo.hasBalance[i].cashAddress
-      //
-      //   // Get the UTXOs for that address.
-      //   // const u = await this.bchjs.Address.utxo(thisAddr)
-      //   // console.log(`u for ${thisAddr}: ${JSON.stringify(u, null, 2)}`)
-      //
-      //   // const utxos = u.utxos
-      //   const utxos = await this.bchjs.Blockbook.utxo(thisAddr)
-      //   // console.log(`utxos for ${thisAddr}: ${JSON.stringify(utxos, null, 2)}`)
-      //
-      //   // Loop through each UXTO returned
-      //   for (var j = 0; j < utxos.length; j++) {
-      //     const thisUTXO = utxos[j]
-      //     // console.log(`thisUTXO: ${util.inspect(thisUTXO)}`)
-      //
-      //     // Add the HD node index to the UTXO for use later.
-      //     thisUTXO.hdIndex = walletInfo.hasBalance[i].index
-      //
-      //     // Add the addresses.
-      //     thisUTXO.cashAddr = thisAddr
-      //     thisUTXO.legacyAddr = this.bchjs.Address.toLegacyAddress(thisAddr)
-      //     thisUTXO.slpAddr = this.bchjs.SLP.Address.toSLPAddress(thisAddr)
-      //
-      //     // Only check against SLP UTXOs, if hte SLPUtxos array exists.
-      //     if (walletInfo.SLPUtxos) {
-      //       // Determine if this UTXO is in the token UTXO list.
-      //       const isToken = walletInfo.SLPUtxos.filter(slpEntry => {
-      //         if (
-      //           slpEntry.txid === thisUTXO.txid &&
-      //           slpEntry.vout === thisUTXO.vout
-      //         ) {
-      //           return slpEntry
-      //         }
-      //       })
-      //       // console.log(`isToken: ${JSON.stringify(isToken, null, 2)}`)
-      //
-      //       // Discard this UTXO if it belongs to a token transaction.
-      //       if (isToken.length > 0) continue
-      //     }
-      //
-      //     // Add the UTXO to the array if it has at least one confirmation.
-      //     // Dev Note: Enable the line below if you want a more conservative
-      //     // approach of wanting a confirmation for each UTXO before spending
-      //     // it. Most wallets spend unconfirmed UTXOs.
-      //     // if (thisUTXO.confirmations > 0) retArray.push(thisUTXO)
-      //     // zero-conf OK.
-      //     retArray.push(thisUTXO)
-      //   }
-      // }
-
-      // console.log(`retArray: ${JSON.stringify(retArray, null, 2)}`)
-      // return retArray
-    } catch (err) {
-      console.log('Error in getUTXOs.', err)
-      throw err
+    // If bchjs is specified, override it with that.
+    if (config && config.bchjs) {
+      this.bchjs = config.bchjs
     }
   }
 
@@ -176,6 +107,7 @@ class AppUtils {
   // or throws an error.
   async broadcastTx (hex) {
     try {
+      // console.log(`this.bchjs.restURL: ${this.bchjs.restURL}`)
       const txid = await this.bchjs.RawTransactions.sendRawTransaction([hex])
 
       return txid
