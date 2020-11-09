@@ -6,7 +6,7 @@ wallet for tokens with value.*
 
 This is an npm library and Bitcoin Cash (BCH) wallet that runs on the command
 line. Add this library to your app to instantly give it the ability to transact
-on the BCH network! New to Bitcoin Cash? Learn the basics with [Mastering Bitcoin Cash](https://developer.bitcoin.com/mastering-bitcoin-cash/).
+on the BCH network! New to Bitcoin Cash? Find educational resources on the [FullStack.cash Documenation page](https://fullstack.cash/documentation).
 
 This project has the following goals:
 - Create a code base for a wallet that is easily forkable and extensible by JavaScript developers.
