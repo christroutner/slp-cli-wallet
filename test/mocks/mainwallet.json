@@ -1,0 +1,74 @@
+{
+  "network": "mainnet",
+  "mnemonic": "tattoo rabbit habit famous rug ugly stem rib spy barrel advance brick",
+  "derivation": 245,
+  "rootAddress": "bitcoincash:qpe5gv3jzephephvssxyjgy5gpn343qfuus9glj6tu",
+  "balance": 0.00005558,
+  "nextAddress": 11,
+  "hasBalance": [
+    {
+      "index": 0,
+      "balance": 0.00005012,
+      "balanceSat": 5012,
+      "unconfirmedBalance": 0,
+      "unconfirmedBalanceSat": 0,
+      "cashAddress": "bitcoincash:qpe5gv3jzephephvssxyjgy5gpn343qfuus9glj6tu"
+    },
+    {
+      "index": 9,
+      "balance": 0.00000546,
+      "balanceSat": 546,
+      "unconfirmedBalance": 0,
+      "unconfirmedBalanceSat": 0,
+      "cashAddress": "bitcoincash:qquumapm94pvsvwkmye65s7cgxauzy3q5cuf4xc9w5"
+    }
+  ],
+  "addresses": [
+    [0, "bitcoincash:qpe5gv3jzephephvssxyjgy5gpn343qfuus9glj6tu"],
+    [1, "bitcoincash:qz4tujledrhrv704zrm5z33gtjqlspgaq5y6kwkldj"],
+    [2, "bitcoincash:qragkf7n5xvdqxj2l4w2aftwz30x68vqksz73vgqna"],
+    [3, "bitcoincash:qzs38uy9nazraghae7upgn75s5a8vcahnvhatpe7ar"],
+    [4, "bitcoincash:qqemp8tmhs6ruv6cjwp6s8k6xx3kuv6hnyt6pwy2yq"],
+    [5, "bitcoincash:qr4qt9m8ccr7cf5d57kh8s3tt74daxw2ls9q2g6ut3"],
+    [6, "bitcoincash:qp8as6dck0y3ptfnfzwd3tf54h3mjcnegc50tphe55"],
+    [7, "bitcoincash:qzw550xd3909j0v9sht64fu3sx8y9luf3v7hd9xcrn"],
+    [8, "bitcoincash:qpp2hwk7wf2092fcdjscjjr0r3egrrzary9q64txk3"],
+    [9, "bitcoincash:qquumapm94pvsvwkmye65s7cgxauzy3q5cuf4xc9w5"],
+    [10, "bitcoincash:qrve8m34ayehlvv9fg04ns25wdm9j7wl7yld7h5uc3"],
+    [11, "bitcoincash:qz7z0grpzkhz2gs7furvecl0x6qey8zvgge6p5lskt"],
+    [12, "bitcoincash:qrfqmuhyhmqdpvcx6lrt8ymdkf9f0av8vyhz2zt59q"],
+    [13, "bitcoincash:qpys6cfgddzwwf5hg0rysld3kletgrsyecdtee8597"],
+    [14, "bitcoincash:qz4kere5vz682kfduajm64nctxf2ttmkyy7l7w2s7t"],
+    [15, "bitcoincash:qzqcvy9qwcqysejl7rq50x0lshzfcraxvcefgd24r8"],
+    [16, "bitcoincash:qqd4ngl30q4q2y4ud6nnnfkuagj96enlwvkgl7s4vd"],
+    [17, "bitcoincash:qqcdt2fl7umfjq9knlm5f428qcxvpjs76gmry8rjhl"],
+    [18, "bitcoincash:qp89rgsleeqtpj3q6qvlymhahrfnnwjytcu0d7vq7d"],
+    [19, "bitcoincash:qztekj3pxsvx8yazhkw03ff9aa00wh2rhysgqnj26r"]
+  ],
+  "name": "temp",
+  "balanceConfirmed": 0.00005558,
+  "balanceUnconfirmed": 0,
+  "SLPUtxos": [
+    {
+      "txid": "3af49b964fc6c794377fec32902a621d76e955709b10e94620b9e074ce247297",
+      "vout": 1,
+      "value": "546",
+      "height": 647803,
+      "confirmations": 2,
+      "satoshis": 546,
+      "utxoType": "token",
+      "transactionType": "send",
+      "tokenId": "a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2",
+      "tokenTicker": "TROUT",
+      "tokenName": "Trout's test token",
+      "tokenDocumentUrl": "troutsblog.com",
+      "tokenDocumentHash": "",
+      "decimals": 2,
+      "tokenQty": 17,
+      "isValid": true,
+      "cashAddr": "bitcoincash:qquumapm94pvsvwkmye65s7cgxauzy3q5cuf4xc9w5",
+      "slpAddr": "simpleledger:qquumapm94pvsvwkmye65s7cgxauzy3q5csj7ad9s2",
+      "hdIndex": 9
+    }
+  ]
+}
